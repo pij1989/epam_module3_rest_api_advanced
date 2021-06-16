@@ -1,0 +1,3 @@
+rootProject.name = 'epam_module3_rest_api_advanced'
+includeBuild '../epam_module2_rest_api_basics'
+

@@ -1,0 +1,24 @@
+plugins{
+    id 'org.springframework.boot' version '2.5.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.epam.esm:epam_module2_rest_api_basics:1.0-SNAPSHOT'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+group 'com.epam.esm'
+version '1.0-SNAPSHOT'
+
+
