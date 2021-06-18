@@ -4,14 +4,36 @@ plugins{
     id 'java'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.epam.esm:epam_module2_rest_api_basics:1.0-SNAPSHOT'
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.2.Final'
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager
+    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.5.2.Final'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
+    implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.20'
+    // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
+    implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.3.5'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-orm
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.2.15.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework/spring-tx
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.2.15.RELEASE'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
