@@ -4,50 +4,35 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.sql.DataSource;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Properties;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource("${path.configure:classpath:database.properties}")
+@PropertySources({@PropertySource("${path.configure:classpath:database.properties}"),
+        @PropertySource("classpath:hibernate.properties")})
 @EnableTransactionManagement
-public class AppConfiguration implements WebMvcConfigurer {
+public class AppConfiguration {
     private static final String DB_URL = "db.url";
     private static final String DB_USERNAME = "db.username";
     private static final String DB_PASSWORD = "db.password";
     private static final String DB_DRIVER = "db.driver";
     private static final String POOL_INITIAL_SIZE = "pool.initialSize";
     private static final String POOL_MAX_TOTAL = "pool.maxTotal";
-    private static final String PARAM_LANG = "lang";
-    private static final String ENCODING = "UTF-8";
-
-    @Value(value = "#{systemProperties['path.changelog']?:'classpath:changeLog.xml'}")
-    private String changeLog;
-
-    @Value(value = "#{systemProperties['path.resourceBundle']?:'classpath:messages'}")
-    private String resourceBundle;
+    private static final String HIBERNATE_DIALECT = "hibernate.dialect";
+    private static final String HIBERNATE_HBM2DDL = "hibernate.hbm2ddl.auto";
+    private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
 
     private final Environment env;
 
@@ -69,43 +54,31 @@ public class AppConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public PlatformTransactionManager txManager(@Autowired DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(dataSource());
+        em.setPackagesToScan("com.epam.esm.model.entity");
+        JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(jpaVendorAdapter);
+        Properties properties = new Properties();
+        properties.setProperty(HIBERNATE_DIALECT, env.getProperty(HIBERNATE_DIALECT));
+        properties.setProperty(HIBERNATE_HBM2DDL, env.getProperty(HIBERNATE_HBM2DDL));
+        properties.setProperty(HIBERNATE_SHOW_SQL, env.getProperty(HIBERNATE_SHOW_SQL));
+        em.setJpaProperties(properties);
+        return em;
     }
 
     @Bean
-    public LocaleResolver localeResolver() {
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.getDefault());
-        return localeResolver;
+    public PlatformTransactionManager txManager() {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        return transactionManager;
     }
 
     @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName(PARAM_LANG);
-        return interceptor;
-    }
-
-    @Bean
-    public ReloadableResourceBundleMessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageBundle = new ReloadableResourceBundleMessageSource();
-        messageBundle.setBasename(resourceBundle);
-        messageBundle.setDefaultEncoding(ENCODING);
-        return messageBundle;
-    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
-                .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME))
-                .serializationInclusion(JsonInclude.Include.NON_NULL)
-                .serializationInclusion(JsonInclude.Include.NON_EMPTY);
-        converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
+    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
+        return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
+                .serializationInclusion(JsonInclude.Include.NON_EMPTY)
+                .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

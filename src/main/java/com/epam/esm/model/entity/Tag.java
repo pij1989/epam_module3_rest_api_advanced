@@ -1,11 +1,22 @@
 package com.epam.esm.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import java.util.ArrayList;
 import java.util.List;
 
+@javax.persistence.Entity(name = "tag")
 public class Tag extends Entity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @ManyToMany(mappedBy = "tags")
+    @JsonIgnoreProperties("tags")
     private List<GiftCertificate> giftCertificates = new ArrayList<>();
 
     public Long getId() {
@@ -25,11 +36,21 @@ public class Tag extends Entity {
     }
 
     public List<GiftCertificate> getGiftCertificates() {
-        return new ArrayList<>(giftCertificates);
+        return giftCertificates;
     }
 
     public void setGiftCertificates(List<GiftCertificate> giftCertificates) {
-        this.giftCertificates = new ArrayList<>(giftCertificates);
+        this.giftCertificates = giftCertificates;
+    }
+
+    public void addGiftCertificate(GiftCertificate giftCertificate) {
+        giftCertificates.add(giftCertificate);
+        giftCertificate.getTags().add(this);
+    }
+
+    public void removeGiftCertificate(GiftCertificate giftCertificate) {
+        giftCertificates.remove(giftCertificate);
+        giftCertificate.getTags().remove(this);
     }
 
     @Override

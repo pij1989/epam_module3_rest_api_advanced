@@ -1,11 +1,15 @@
 package com.epam.esm.model.entity;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@javax.persistence.Entity(name = "gift_certificate")
 public class GiftCertificate extends Entity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
@@ -13,6 +17,12 @@ public class GiftCertificate extends Entity {
     private Integer duration;
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "gift_certificate_tag",
+            joinColumns = {@JoinColumn(name = "gift_certificate_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
+    )
     private List<Tag> tags = new ArrayList<>();
 
     public GiftCertificate() {
@@ -75,11 +85,21 @@ public class GiftCertificate extends Entity {
     }
 
     public List<Tag> getTags() {
-        return new ArrayList<>(tags);
+        return tags;
     }
 
     public void setTags(List<Tag> tags) {
-        this.tags = new ArrayList<>(tags);
+        this.tags = tags;
+    }
+
+    public void addTag(Tag tag) {
+        tags.add(tag);
+        tag.getGiftCertificates().add(this);
+    }
+
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+        tag.getGiftCertificates().remove(this);
     }
 
     @Override
