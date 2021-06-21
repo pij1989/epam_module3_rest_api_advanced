@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  messages:
+    basename: messages
+    encoding: UTF-8
+  liquibase:
+    enabled: false
+logging:
+  level:
+    org:
+      springframework:
+        transaction:
+          interceptor: TRACE
+    com:
+      epam:
+        esm:
+          configuration:
+            DevDatasourceConfiguration: TRACE

@@ -7,11 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
+    private static final String PERCENT = "%";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -32,17 +36,48 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public Optional<GiftCertificate> updatePart(GiftCertificate giftCertificate) {
-        return Optional.empty();
+        GiftCertificate foundGiftCertificate = entityManager.find(GiftCertificate.class, giftCertificate.getId());
+        if (foundGiftCertificate == null) {
+            return Optional.empty();
+        }
+        if (giftCertificate.getName() != null) {
+            foundGiftCertificate.setName(giftCertificate.getName());
+        }
+        if (giftCertificate.getDescription() != null) {
+            foundGiftCertificate.setDescription(giftCertificate.getDescription());
+        }
+        if (giftCertificate.getPrice() != null) {
+            foundGiftCertificate.setPrice(giftCertificate.getPrice());
+        }
+        if (giftCertificate.getDuration() != null) {
+            foundGiftCertificate.setDuration(giftCertificate.getDuration());
+        }
+        if (giftCertificate.getCreateDate() != null) {
+            foundGiftCertificate.setCreateDate(giftCertificate.getCreateDate());
+        }
+        if (giftCertificate.getLastUpdateDate() != null) {
+            foundGiftCertificate.setLastUpdateDate(giftCertificate.getLastUpdateDate());
+        }
+        entityManager.flush();
+        return Optional.of(foundGiftCertificate);
     }
 
     @Override
     public List<GiftCertificate> findGiftCertificatesByTagName(String name) {
-        return null;
+        return entityManager.createQuery("SELECT gc FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name order by gc.id", GiftCertificate.class)
+                .setParameter(ColumnName.NAME, name)
+                .getResultList();
     }
 
     @Override
     public List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter) {
-        return null;
+        String parameter = PERCENT + filter.toLowerCase() + PERCENT;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
+        Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        cq.select(root).where(cb.or(cb.like(root.get(ColumnName.NAME), parameter),
+                cb.like(root.get(ColumnName.DESCRIPTION), parameter)));
+        return entityManager.createQuery(cq).getResultList();
     }
 
     @Override
@@ -59,7 +94,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findAll() {
-        return entityManager.createQuery("SELECT gc FROM gift_certificate gc", GiftCertificate.class)
+        return entityManager.createQuery("SELECT gc FROM gift_certificate gc order by gc.id", GiftCertificate.class)
                 .getResultList();
     }
 
@@ -71,6 +106,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean deleteById(Long id) {
+        GiftCertificate giftCertificate = entityManager.find(GiftCertificate.class, id);
+        if (giftCertificate != null) {
+            entityManager.remove(giftCertificate);
+            return true;
+        }
         return false;
     }
 }
