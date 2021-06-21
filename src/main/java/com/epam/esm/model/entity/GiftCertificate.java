@@ -1,5 +1,7 @@
 package com.epam.esm.model.entity;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @javax.persistence.Entity(name = "gift_certificate")
-public class GiftCertificate extends Entity {
+public class GiftCertificate extends RepresentationModel<GiftCertificate> implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,7 +17,9 @@ public class GiftCertificate extends Entity {
     private String description;
     private BigDecimal price;
     private Integer duration;
+    @Column(name = "create_date")
     private LocalDateTime createDate;
+    @Column(name = "last_update_date")
     private LocalDateTime lastUpdateDate;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(

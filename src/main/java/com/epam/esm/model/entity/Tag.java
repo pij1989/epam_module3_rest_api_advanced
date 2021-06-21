@@ -1,6 +1,7 @@
 package com.epam.esm.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @javax.persistence.Entity(name = "tag")
-public class Tag extends Entity {
+public class Tag extends RepresentationModel<Tag> implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

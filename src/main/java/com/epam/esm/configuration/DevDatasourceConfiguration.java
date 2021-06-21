@@ -1,10 +1,9 @@
 package com.epam.esm.configuration;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -12,18 +11,16 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
 
 @Configuration
+@Profile("dev")
 @ComponentScan("com.epam.esm")
-@PropertySources({@PropertySource("${path.configure:classpath:database.properties}"),
-        @PropertySource("classpath:hibernate.properties")})
-@EnableTransactionManagement
-public class AppConfiguration {
+@PropertySources({@PropertySource("classpath:database_dev.properties"),
+        @PropertySource("classpath:hibernate_dev.properties")})
+public class DevDatasourceConfiguration {
     private static final String DB_URL = "db.url";
     private static final String DB_USERNAME = "db.username";
     private static final String DB_PASSWORD = "db.password";
@@ -33,11 +30,13 @@ public class AppConfiguration {
     private static final String HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String HIBERNATE_HBM2DDL = "hibernate.hbm2ddl.auto";
     private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
+    private static final String PACKAGE_TO_SCAN = "com.epam.esm.model.entity";
+    private static final Logger logger = LoggerFactory.getLogger(DevDatasourceConfiguration.class);
 
     private final Environment env;
 
     @Autowired
-    public AppConfiguration(Environment env) {
+    public DevDatasourceConfiguration(Environment env) {
         this.env = env;
     }
 
@@ -50,6 +49,7 @@ public class AppConfiguration {
         basicDataSource.setDriverClassName(env.getProperty(DB_DRIVER));
         basicDataSource.setInitialSize(Integer.parseInt(Objects.requireNonNull(env.getProperty(POOL_INITIAL_SIZE))));
         basicDataSource.setMaxTotal(Integer.parseInt(Objects.requireNonNull(env.getProperty(POOL_MAX_TOTAL))));
+        logger.debug("BasicDataSource is created...");
         return basicDataSource;
     }
 
@@ -57,7 +57,7 @@ public class AppConfiguration {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("com.epam.esm.model.entity");
+        em.setPackagesToScan(PACKAGE_TO_SCAN);
         JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(jpaVendorAdapter);
         Properties properties = new Properties();
@@ -65,6 +65,7 @@ public class AppConfiguration {
         properties.setProperty(HIBERNATE_HBM2DDL, env.getProperty(HIBERNATE_HBM2DDL));
         properties.setProperty(HIBERNATE_SHOW_SQL, env.getProperty(HIBERNATE_SHOW_SQL));
         em.setJpaProperties(properties);
+        logger.debug("LocalContainerEntityManagerFactoryBean is created...");
         return em;
     }
 
@@ -72,13 +73,7 @@ public class AppConfiguration {
     public PlatformTransactionManager txManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        logger.debug("PlatformTransactionManager is created...");
         return transactionManager;
-    }
-
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
-        return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
-                .serializationInclusion(JsonInclude.Include.NON_EMPTY)
-                .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
     }
 }
