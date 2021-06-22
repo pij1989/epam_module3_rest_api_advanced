@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -44,5 +45,16 @@ public class TagServiceImpl implements TagService {
     @Transactional
     public boolean deleteTag(Long id) {
         return tagDao.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public List<Tag> findTags(String page, String size) {
+        long numPage = Long.parseLong(page);
+        long numSize = Long.parseLong(size);
+        return tagDao.findAll().stream()
+                .skip((numPage - 1) * numSize)
+                .limit(numSize)
+                .collect(Collectors.toList());
     }
 }

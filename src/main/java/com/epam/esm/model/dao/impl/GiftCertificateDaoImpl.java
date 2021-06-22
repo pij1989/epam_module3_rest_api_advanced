@@ -71,12 +71,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter) {
-        String parameter = PERCENT + filter.toLowerCase() + PERCENT;
+        String parameter = PERCENT + filter.toUpperCase() + PERCENT;
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
         Root<GiftCertificate> root = cq.from(GiftCertificate.class);
-        cq.select(root).where(cb.or(cb.like(root.get(ColumnName.NAME), parameter),
-                cb.like(root.get(ColumnName.DESCRIPTION), parameter)));
+        cq.select(root).where(cb.or(cb.like(cb.upper(root.get(ColumnName.NAME)), parameter),
+                cb.like(cb.upper(root.get(ColumnName.DESCRIPTION)), parameter)));
         return entityManager.createQuery(cq).getResultList();
     }
 

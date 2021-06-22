@@ -13,4 +13,6 @@ public interface TagService {
     List<Tag> findAllTag();
 
     boolean deleteTag(Long id);
+
+    List<Tag> findTags(String page, String size);
 }

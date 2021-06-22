@@ -9,9 +9,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +26,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/tags")
+@RequestMapping(value = "/tags", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE})
 public class TagController {
     private static final Logger logger = LogManager.getLogger(TagController.class);
+    private static final String DEFAULT_PAGE_NUMBER = "1";
+    private static final String DEFAULT_PAGE_SIZE = "5";
     private final TagService tagService;
 
     @Autowired
@@ -73,6 +79,15 @@ public class TagController {
         Link link = linkTo(methodOn(TagController.class).findAllTags()).withSelfRel();
         CollectionModel<Tag> tagCollectionModel = CollectionModel.of(tags, link);
         return new ResponseEntity<>(tagCollectionModel, HttpStatus.OK);
+    }
+
+    @GetMapping(params = {"page", "size"})
+    ResponseEntity<PagedModel<Tag>> findTags(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) String size) throws NotFoundException, BadRequestException {
+        List<Tag> tags = tagService.findTags(page, size);
+        Link selfLink = Link.of(ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString());
+        PagedModel<Tag> pagedModel = PagedModel.of(tags, new PagedModel.PageMetadata(5, 1, 30), selfLink);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
