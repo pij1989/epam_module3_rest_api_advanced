@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @javax.persistence.Entity(name = "tag")
-public class Tag extends RepresentationModel<Tag> implements Entity {
+public class Tag implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
