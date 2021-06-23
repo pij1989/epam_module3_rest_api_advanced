@@ -4,10 +4,13 @@ import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
+import com.epam.esm.model.hateoas.assembler.GiftCertificateModelAssembler;
+import com.epam.esm.model.hateoas.model.GiftCertificateModel;
 import com.epam.esm.model.service.GiftCertificateService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,27 +27,29 @@ import static com.epam.esm.model.error.MessageKeyError.*;
 public class GiftCertificateController {
     private static final Logger logger = LogManager.getLogger(GiftCertificate.class);
     private final GiftCertificateService giftCertificateService;
+    private final GiftCertificateModelAssembler giftCertificateModelAssembler;
 
     @Autowired
-    public GiftCertificateController(GiftCertificateService giftCertificateService) {
+    public GiftCertificateController(GiftCertificateService giftCertificateService, GiftCertificateModelAssembler giftCertificateModelAssembler) {
         this.giftCertificateService = giftCertificateService;
+        this.giftCertificateModelAssembler = giftCertificateModelAssembler;
     }
 
     @PostMapping
-    public ResponseEntity<GiftCertificate> createGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
+    public ResponseEntity<GiftCertificateModel> createGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
         logger.debug("Created gift certificate: " + giftCertificate);
         Optional<GiftCertificate> optionalGiftCertificate = giftCertificateService.createGiftCertificate(giftCertificate);
         if (optionalGiftCertificate.isPresent()) {
             GiftCertificate createdGiftCertificate = optionalGiftCertificate.get();
-            return new ResponseEntity<>(createdGiftCertificate, HttpStatus.CREATED);
+            GiftCertificateModel giftCertificateModel = giftCertificateModelAssembler.toModel(createdGiftCertificate);
+            return new ResponseEntity<>(giftCertificateModel, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/{certificateId}")
-    public ResponseEntity<GiftCertificate> findGiftCertificate(@PathVariable String certificateId) throws BadRequestException, NotFoundException {
-        logger.debug("Path variable: " + certificateId);
+    public ResponseEntity<GiftCertificateModel> findGiftCertificate(@PathVariable String certificateId) throws BadRequestException, NotFoundException {
         long parseId;
         try {
             parseId = Long.parseLong(certificateId);
@@ -53,14 +58,15 @@ public class GiftCertificateController {
             throw new BadRequestException(CERTIFICATE_BAD_REQUEST, e, new Object[]{certificateId});
         }
         Optional<GiftCertificate> optionalGiftCertificate = giftCertificateService.findGiftCertificate(parseId);
-        return optionalGiftCertificate.map(giftCertificate -> new ResponseEntity<>(giftCertificate, HttpStatus.OK))
+        return optionalGiftCertificate.map(giftCertificate -> new ResponseEntity<>(giftCertificateModelAssembler.toModel(giftCertificate), HttpStatus.OK))
                 .orElseThrow(() -> new NotFoundException(CERTIFICATE_NOT_FOUND_ID, new Object[]{certificateId}));
     }
 
     @GetMapping
-    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificate() {
+    public ResponseEntity<CollectionModel<GiftCertificateModel>> findAllGiftCertificate() {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllGiftCertificate();
-        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+        CollectionModel<GiftCertificateModel> certificateModels = giftCertificateModelAssembler.toCollectionModel(giftCertificates);
+        return new ResponseEntity<>(certificateModels, HttpStatus.OK);
     }
 
     @GetMapping(params = {"tagName"})

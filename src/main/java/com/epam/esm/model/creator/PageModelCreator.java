@@ -12,25 +12,24 @@ import java.util.stream.Collectors;
 
 import static org.springframework.web.util.UriComponentsBuilder.fromUri;
 
-public class PageModelCreator<T extends Entity> {
+public class PageModelCreator<T extends Entity, D extends RepresentationModel<?>> {
     private static final String DEFAULT_REQUEST_PARAM_PAGE = "page";
     private static final String DEFAULT_REQUEST_PARAM_SIZE = "size";
 
     private PageModelCreator() {
     }
 
-    public static <T extends Entity> PagedModel<EntityModel<T>> create(Page<T> page, RepresentationModelAssembler<T,
-            EntityModel<T>> representationModelAssembler) {
+    public static <T extends Entity, D extends RepresentationModel<?>> PagedModel<D> create(Page<T> page, RepresentationModelAssembler<T, D> representationModelAssembler) {
         PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(page.getSize(), page.getNumber(),
                 page.getTotalElements(), page.getTotalPages());
-        List<EntityModel<T>> entityModels = page.getList().stream()
+        List<D> entityModels = page.getList().stream()
                 .map(representationModelAssembler::toModel)
                 .collect(Collectors.toList());
-        PagedModel<EntityModel<T>> pagedModel = PagedModel.of(entityModels, pageMetadata);
+        PagedModel<D> pagedModel = PagedModel.of(entityModels, pageMetadata);
         return addPaginationLinks(pagedModel, page);
     }
 
-    private static <T extends Entity> PagedModel<EntityModel<T>> addPaginationLinks(PagedModel<EntityModel<T>> pagedModel, Page<T> page) {
+    private static <T extends Entity, D extends RepresentationModel<?>> PagedModel<D> addPaginationLinks(PagedModel<D> pagedModel, Page<T> page) {
 
         UriTemplate base = UriTemplate.of(ServletUriComponentsBuilder.fromCurrentRequest().build().toString());
 

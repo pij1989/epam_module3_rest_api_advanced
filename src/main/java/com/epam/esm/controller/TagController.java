@@ -1,17 +1,17 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.model.assembler.TagModelAssembler;
 import com.epam.esm.model.creator.PageModelCreator;
 import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
+import com.epam.esm.model.hateoas.assembler.TagModelAssembler;
+import com.epam.esm.model.hateoas.model.TagModel;
 import com.epam.esm.model.service.TagService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -40,11 +40,11 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<Tag>> createTag(@RequestBody Tag tag) {
+    public ResponseEntity<TagModel> createTag(@RequestBody Tag tag) {
         Optional<Tag> optionalTag = tagService.create(tag);
         if (optionalTag.isPresent()) {
             Tag createdTag = optionalTag.get();
-            EntityModel<Tag> tagModel = tagModelAssembler.toModel(createdTag);
+            TagModel tagModel = tagModelAssembler.toModel(createdTag);
             return new ResponseEntity<>(tagModel, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,7 +52,7 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Tag>> findTag(@PathVariable String id) throws NotFoundException, BadRequestException {
+    public ResponseEntity<TagModel> findTag(@PathVariable String id) throws NotFoundException, BadRequestException {
         long parseId;
         try {
             parseId = Long.parseLong(id);
@@ -63,7 +63,7 @@ public class TagController {
         Optional<Tag> optionalTag = tagService.findTag(parseId);
         if (optionalTag.isPresent()) {
             Tag tag = optionalTag.get();
-            EntityModel<Tag> tagModel = tagModelAssembler.toModel(tag);
+            TagModel tagModel = tagModelAssembler.toModel(tag);
             return new ResponseEntity<>(tagModel, HttpStatus.OK);
         } else {
             throw new NotFoundException(TAG_NOT_FOUND, new Object[]{id});
@@ -71,15 +71,15 @@ public class TagController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<Tag>>> findAllTags() {
+    public ResponseEntity<CollectionModel<TagModel>> findAllTags() {
         List<Tag> tags = tagService.findAllTag();
-        CollectionModel<EntityModel<Tag>> tagCollectionModel = tagModelAssembler.toCollectionModel(tags);
+        CollectionModel<TagModel> tagCollectionModel = tagModelAssembler.toCollectionModel(tags);
         return new ResponseEntity<>(tagCollectionModel, HttpStatus.OK);
     }
 
     @GetMapping(params = {"page", "size"})
-    public ResponseEntity<PagedModel<EntityModel<Tag>>> findTags(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) String page,
-                                                                 @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException {
+    public ResponseEntity<PagedModel<TagModel>> findTags(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                                         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
         int numPage;
         int numSize;
         try {
@@ -90,8 +90,12 @@ public class TagController {
             throw new BadRequestException(TAG_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
         }
         Page<Tag> tagPage = tagService.findTags(numPage, numSize);
-        PagedModel<EntityModel<Tag>> pagedModel = PageModelCreator.create(tagPage, tagModelAssembler);
-        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
+        if (!tagPage.getList().isEmpty()) {
+            PagedModel<TagModel> pagedModel = PageModelCreator.create(tagPage, tagModelAssembler);
+            return new ResponseEntity<>(pagedModel, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
     }
 
     @DeleteMapping("/{id}")
