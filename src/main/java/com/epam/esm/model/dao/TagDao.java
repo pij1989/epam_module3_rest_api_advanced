@@ -7,5 +7,5 @@ import java.util.List;
 public interface TagDao extends BaseDao<Long, Tag> {
     List<Tag> findTagsWithLimitAndOffset(int offset, int limit);
 
-    int countTag();
+    long countTag();
 }

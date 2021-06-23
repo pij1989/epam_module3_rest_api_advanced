@@ -2,6 +2,7 @@ package com.epam.esm.model.dao.impl;
 
 import com.epam.esm.model.dao.GiftCertificateDao;
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Sort;
 import com.epam.esm.model.entity.Tag;
 import org.springframework.stereotype.Repository;
 
@@ -112,5 +113,20 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<GiftCertificate> findGiftCertificatesWithOffsetAndLimit(int offset, int limit) {
+        return null;
+    }
+
+    @Override
+    public List<GiftCertificate> findGiftCertificatesWithOffsetAndLimitOrderBy(int offset, int limit, Sort sort) {
+        return null;
+    }
+
+    @Override
+    public long countGiftCertificate() {
+        return 0;
     }
 }

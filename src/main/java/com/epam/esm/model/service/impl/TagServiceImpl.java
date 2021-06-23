@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,10 +51,14 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public Page<Tag> findTags(int page, int size) {
+        List<Tag> tags = new ArrayList<>();
         int offset = (page - 1) * size;
-        int totalElements = tagDao.countTag();
-        List<Tag> tags = tagDao.findTagsWithLimitAndOffset(offset, size);
-        int totalPages = ((totalElements / size) % 2) == 0 ? totalElements / size : (totalElements / size) + 1;
+        long totalElements = tagDao.countTag();
+        int totalPages = 0;
+        if (totalElements > 0) {
+            tags = tagDao.findTagsWithLimitAndOffset(offset, size);
+            totalPages = (int) (totalElements % size == 0 ? totalElements / size : (totalElements / size) + 1);
+        }
         return new Page<>(tags, totalPages, totalElements, page, size);
     }
 }

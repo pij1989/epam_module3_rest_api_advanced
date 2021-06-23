@@ -1,8 +1,5 @@
 package com.epam.esm.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.hateoas.RepresentationModel;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,7 +14,7 @@ public class Tag implements Entity {
     private Long id;
     private String name;
     @ManyToMany(mappedBy = "tags")
-    @JsonIgnoreProperties("tags")
+//    @JsonIgnoreProperties("tags")
     private List<GiftCertificate> giftCertificates = new ArrayList<>();
 
     public Long getId() {

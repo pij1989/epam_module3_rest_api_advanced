@@ -62,7 +62,11 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public int countTag() {
-        return entityManager.createQuery("SELECT count (t) FROM tag t").getFirstResult();
+    public long countTag() {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        cq.select(cb.count(cq.from(Tag.class)));
+        return entityManager.createQuery(cq).getSingleResult();
+//        return Math.toIntExact(entityManager.createQuery("SELECT count(t) FROM tag t", Long.class).getSingleResult());
     }
 }
