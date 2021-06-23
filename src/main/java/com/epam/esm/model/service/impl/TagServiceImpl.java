@@ -1,6 +1,7 @@
 package com.epam.esm.model.service.impl;
 
 import com.epam.esm.model.dao.TagDao;
+import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -49,12 +49,11 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public List<Tag> findTags(String page, String size) {
-        long numPage = Long.parseLong(page);
-        long numSize = Long.parseLong(size);
-        return tagDao.findAll().stream()
-                .skip((numPage - 1) * numSize)
-                .limit(numSize)
-                .collect(Collectors.toList());
+    public Page<Tag> findTags(int page, int size) {
+        int offset = (page - 1) * size;
+        int totalElements = tagDao.countTag();
+        List<Tag> tags = tagDao.findTagsWithLimitAndOffset(offset, size);
+        int totalPages = ((totalElements / size) % 2) == 0 ? totalElements / size : (totalElements / size) + 1;
+        return new Page<>(tags, totalPages, totalElements, page, size);
     }
 }

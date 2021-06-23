@@ -3,6 +3,7 @@ package com.epam.esm.model.error;
 public class MessageKeyError {
     public static final String TAG_BAD_REQUEST = "error.400.tag";
     public static final String TAG_NOT_FOUND = "error.404.tag";
+    public static final String TAG_BAD_REQUEST_PARAMETERS = "error.400.tags";
     public static final String CERTIFICATE_BAD_REQUEST = "error.400.certificate";
     public static final String CERTIFICATE_NOT_FOUND_ID = "error.404.certificate.id";
     public static final String CERTIFICATE_BAD_REQUEST_TAG_CREATED = "error.400.certificate.tag_not_created";

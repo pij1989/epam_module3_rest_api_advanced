@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,5 +48,21 @@ public class TagDaoImpl implements TagDao {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Tag> findTagsWithLimitAndOffset(int offset, int limit) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
+        Root<Tag> root = cq.from(Tag.class);
+        return entityManager.createQuery(cq.select(root))
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
+    public int countTag() {
+        return entityManager.createQuery("SELECT count (t) FROM tag t").getFirstResult();
     }
 }

@@ -28,6 +28,13 @@ logging:
       springframework:
         transaction:
           interceptor: TRACE
+    com:
+      epam:
+        esm:
+          model:
+            creator: DEBUG
+
+
 #  main:
 #    allow-bean-definition-overriding: true
 #debug: true

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @javax.persistence.Entity(name = "gift_certificate")
-public class GiftCertificate extends RepresentationModel<GiftCertificate> implements Entity {
+public class GiftCertificate implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

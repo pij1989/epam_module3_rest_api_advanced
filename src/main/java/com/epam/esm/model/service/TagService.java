@@ -1,5 +1,6 @@
 package com.epam.esm.model.service;
 
+import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface TagService {
 
     boolean deleteTag(Long id);
 
-    List<Tag> findTags(String page, String size);
+    Page<Tag> findTags(int page, int size);
 }

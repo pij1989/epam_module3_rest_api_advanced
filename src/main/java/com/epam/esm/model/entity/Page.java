@@ -6,17 +6,17 @@ public class Page<T extends Entity> {
     private List<T> list;
     private int totalPages;
     private long totalElements;
-    private int page;
+    private int number;
     private int size;
 
     public Page() {
     }
 
-    public Page(List<T> list, int totalPages, long totalElements, int page, int size) {
+    public Page(List<T> list, int totalPages, long totalElements, int number, int size) {
         this.list = list;
         this.totalPages = totalPages;
         this.totalElements = totalElements;
-        this.page = page;
+        this.number = number;
         this.size = size;
     }
 
@@ -44,12 +44,12 @@ public class Page<T extends Entity> {
         this.totalElements = totalElements;
     }
 
-    public int getPage() {
-        return page;
+    public int getNumber() {
+        return number;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public int getSize() {
@@ -58,5 +58,13 @@ public class Page<T extends Entity> {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public boolean hasPrevious(){
+        return number > 1;
+    }
+
+    public boolean hasNext() {
+        return number + 1 <= totalPages;
     }
 }
