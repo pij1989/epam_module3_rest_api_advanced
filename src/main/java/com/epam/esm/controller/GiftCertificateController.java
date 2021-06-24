@@ -12,7 +12,6 @@ import com.epam.esm.model.service.GiftCertificateService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_NUMBER;
@@ -67,13 +65,6 @@ public class GiftCertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<GiftCertificateModel>> findAllGiftCertificate() {
-        List<GiftCertificate> giftCertificates = giftCertificateService.findAllGiftCertificate();
-        CollectionModel<GiftCertificateModel> certificateModels = giftCertificateModelAssembler.toCollectionModel(giftCertificates);
-        return new ResponseEntity<>(certificateModels, HttpStatus.OK);
-    }
-
-    @GetMapping(params = {"page", "size"})
     public ResponseEntity<PagedModel<GiftCertificateModel>> findGiftCertificates(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
                                                                                  @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
         int numPage;
@@ -117,14 +108,30 @@ public class GiftCertificateController {
     }
 
     @GetMapping(params = {"filter"})
-    public ResponseEntity<List<GiftCertificate>> searchGiftCertificate(@RequestParam("filter") String filter) {
-        logger.debug("Filter: " + filter);
-        List<GiftCertificate> giftCertificates = giftCertificateService.searchGiftCertificate(filter);
-        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+    public ResponseEntity<PagedModel<GiftCertificateModel>> searchGiftCertificate(@RequestParam("filter") String filter,
+                                                                                  @RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                                                                  @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
+        int numPage;
+        int numSize;
+        try {
+            numPage = Integer.parseInt(page);
+            numSize = Integer.parseInt(size);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(CERTIFICATE_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
+        }
+        Page<GiftCertificate> giftCertificatePage = giftCertificateService.searchGiftCertificate(filter, numPage, numSize);
+        if (!giftCertificatePage.getList().isEmpty()) {
+            PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(giftCertificatePage, giftCertificateModelAssembler);
+            return new ResponseEntity<>(certificateModels, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
     }
 
-    @GetMapping(params = {"sort"})
+    @GetMapping(params = {"sort", "order"})
     public ResponseEntity<PagedModel<GiftCertificateModel>> sortGiftCertificate(@RequestParam("sort") String sort,
+                                                                                @RequestParam("order") String order,
                                                                                 @RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
                                                                                 @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
         int numPage;
@@ -136,7 +143,7 @@ public class GiftCertificateController {
             logger.error("Bad request:" + e.getMessage());
             throw new BadRequestException(CERTIFICATE_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
         }
-        Page<GiftCertificate> giftCertificatePage = giftCertificateService.sortGiftCertificate(sort, numPage, numSize);
+        Page<GiftCertificate> giftCertificatePage = giftCertificateService.sortGiftCertificate(sort, order, numPage, numSize);
         if (!giftCertificatePage.getList().isEmpty()) {
             PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(giftCertificatePage, giftCertificateModelAssembler);
             return new ResponseEntity<>(certificateModels, HttpStatus.OK);

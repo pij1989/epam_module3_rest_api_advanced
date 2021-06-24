@@ -28,7 +28,7 @@ public interface GiftCertificateService {
 
     Page<GiftCertificate> findGiftCertificateByTagName(String name, int page, int size);
 
-    List<GiftCertificate> searchGiftCertificate(String filter);
+    Page<GiftCertificate> searchGiftCertificate(String filter, int page, int size);
 
-    Page<GiftCertificate> sortGiftCertificate(String sort, int page, int size);
+    Page<GiftCertificate> sortGiftCertificate(String sort, String order, int page, int size);
 }

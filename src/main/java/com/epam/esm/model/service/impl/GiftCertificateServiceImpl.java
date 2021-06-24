@@ -15,19 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     public static final Logger logger = LoggerFactory.getLogger(GiftCertificateServiceImpl.class);
-    private static final String COMMA_DELIMITER = ",";
-    private static final String ASC = "asc";
-    private static final String DESC = "desc";
-    private static final String NAME = "name";
-    private static final String CREATE_DATE = "createDate";
+    private static final String SORT_NAME = "name";
+    private static final String SORT_CREATE_DATE = "createDate";
+    private static final String DEFAULT_SORT = "id";
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
 
@@ -145,25 +141,33 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     @Transactional
-    public List<GiftCertificate> searchGiftCertificate(String filter) {
-        return giftCertificateDao.findGiftCertificateLikeNameOrDescription(filter);
+    public Page<GiftCertificate> searchGiftCertificate(String filter, int page, int size) {
+        List<GiftCertificate> certificates = new ArrayList<>();
+        int offset = (page - 1) * size;
+        long totalElements = giftCertificateDao.countGiftCertificateLikeNameOrDescription(filter);
+        int totalPages = 0;
+        if (totalElements > 0) {
+            certificates = giftCertificateDao.findGiftCertificateLikeNameOrDescription(filter, offset, size);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
+        return new Page<>(certificates, totalPages, totalElements, page, size);
     }
 
     @Override
     @Transactional
-    public Page<GiftCertificate> sortGiftCertificate(String sort, int page, int size) {
+    public Page<GiftCertificate> sortGiftCertificate(String sort, String order, int page, int size) {
         List<GiftCertificate> giftCertificates = new ArrayList<>();
-        String[] requestParameters = sort.split(COMMA_DELIMITER);
-        String type = requestParameters[0].trim();
-        String order = requestParameters[1].trim().toUpperCase();
         Sort.Direction direction;
         try {
-            direction = Sort.Direction.valueOf(order);
+            direction = Sort.Direction.valueOf(order.toUpperCase());
         } catch (IllegalArgumentException e) {
             logger.error("Invalid order of sorting: " + order, e);
             direction = Sort.Direction.ASC;
         }
-        Sort sorting = new Sort(type, direction);
+        if (!sort.equals(SORT_NAME) && !sort.equals(SORT_CREATE_DATE)) {
+            sort = DEFAULT_SORT;
+        }
+        Sort sorting = new Sort(sort, direction);
         int offset = (page - 1) * size;
         long totalElements = giftCertificateDao.countGiftCertificate();
         int totalPages = 0;
@@ -172,34 +176,5 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             totalPages = PaginationUtil.defineTotalPages(totalElements, size);
         }
         return new Page<>(giftCertificates, totalPages, totalElements, page, size);
-        /*switch (type) {
-            case NAME: {
-                return sort(giftCertificates, Comparator.comparing(GiftCertificate::getName), order);
-            }
-            case CREATE_DATE: {
-                return sort(giftCertificates, Comparator.comparing(GiftCertificate::getCreateDate), order);
-            }
-            default: {
-                return giftCertificates;
-            }
-        }*/
-    }
-
-    private List<GiftCertificate> sort(List<GiftCertificate> giftCertificates, Comparator<GiftCertificate> comparator, String order) {
-        switch (order) {
-            case ASC: {
-                return giftCertificates.stream()
-                        .sorted(comparator)
-                        .collect(Collectors.toList());
-            }
-            case DESC: {
-                return giftCertificates.stream()
-                        .sorted(comparator.reversed())
-                        .collect(Collectors.toList());
-            }
-            default: {
-                return giftCertificates;
-            }
-        }
     }
 }

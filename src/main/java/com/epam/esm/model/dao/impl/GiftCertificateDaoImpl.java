@@ -73,14 +73,17 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter) {
+    public List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter, int offset, int limit) {
         String parameter = PERCENT + filter.toUpperCase() + PERCENT;
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
         Root<GiftCertificate> root = cq.from(GiftCertificate.class);
         cq.select(root).where(cb.or(cb.like(cb.upper(root.get(ColumnName.NAME)), parameter),
                 cb.like(cb.upper(root.get(ColumnName.DESCRIPTION)), parameter)));
-        return entityManager.createQuery(cq).getResultList();
+        return entityManager.createQuery(cq)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
     @Override
@@ -163,5 +166,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return entityManager.createQuery("SELECT count(t.name) FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name", Long.class)
                 .setParameter(ColumnName.NAME, name)
                 .getSingleResult();
+    }
+
+    @Override
+    public long countGiftCertificateLikeNameOrDescription(String filter) {
+        return 0;
     }
 }
