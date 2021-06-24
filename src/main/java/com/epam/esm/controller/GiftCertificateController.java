@@ -1,6 +1,8 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.model.creator.PageModelCreator;
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
@@ -11,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_NUMBER;
+import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_SIZE;
 import static com.epam.esm.model.error.MessageKeyError.*;
 
 @RestController
@@ -37,7 +42,6 @@ public class GiftCertificateController {
 
     @PostMapping
     public ResponseEntity<GiftCertificateModel> createGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
-        logger.debug("Created gift certificate: " + giftCertificate);
         Optional<GiftCertificate> optionalGiftCertificate = giftCertificateService.createGiftCertificate(giftCertificate);
         if (optionalGiftCertificate.isPresent()) {
             GiftCertificate createdGiftCertificate = optionalGiftCertificate.get();
@@ -69,12 +73,44 @@ public class GiftCertificateController {
         return new ResponseEntity<>(certificateModels, HttpStatus.OK);
     }
 
+    @GetMapping(params = {"page", "size"})
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findGiftCertificates(@RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                                                                 @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
+        int numPage;
+        int numSize;
+        try {
+            numPage = Integer.parseInt(page);
+            numSize = Integer.parseInt(size);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(CERTIFICATE_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
+        }
+        Page<GiftCertificate> giftCertificatePage = giftCertificateService.findGiftCertificates(numPage, numSize);
+        if (!giftCertificatePage.getList().isEmpty()) {
+            PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(giftCertificatePage, giftCertificateModelAssembler);
+            return new ResponseEntity<>(certificateModels, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
+    }
+
     @GetMapping(params = {"tagName"})
-    public ResponseEntity<List<GiftCertificate>> findGiftCertificateByTagName(@RequestParam("tagName") String name) throws NotFoundException {
-        logger.debug("Name: " + name);
-        List<GiftCertificate> giftCertificates = giftCertificateService.findGiftCertificateByTagName(name);
-        if (!giftCertificates.isEmpty()) {
-            return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findGiftCertificateByTagName(@RequestParam("tagName") String name,
+                                                                                         @RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                                                                         @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws NotFoundException, BadRequestException {
+        int numPage;
+        int numSize;
+        try {
+            numPage = Integer.parseInt(page);
+            numSize = Integer.parseInt(size);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(CERTIFICATE_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
+        }
+        Page<GiftCertificate> giftCertificatePage = giftCertificateService.findGiftCertificateByTagName(name, numPage, numSize);
+        if (!giftCertificatePage.getList().isEmpty()) {
+            PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(giftCertificatePage, giftCertificateModelAssembler);
+            return new ResponseEntity<>(certificateModels, HttpStatus.OK);
         } else {
             throw new NotFoundException(CERTIFICATE_NOT_FOUND_TAG_NAME, new Object[]{name});
         }
@@ -88,10 +124,25 @@ public class GiftCertificateController {
     }
 
     @GetMapping(params = {"sort"})
-    public ResponseEntity<List<GiftCertificate>> sortGiftCertificate(@RequestParam("sort") String sort) {
-        logger.debug("Sort: " + sort);
-        List<GiftCertificate> giftCertificates = giftCertificateService.sortGiftCertificate(sort);
-        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+    public ResponseEntity<PagedModel<GiftCertificateModel>> sortGiftCertificate(@RequestParam("sort") String sort,
+                                                                                @RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) String page,
+                                                                                @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
+        int numPage;
+        int numSize;
+        try {
+            numPage = Integer.parseInt(page);
+            numSize = Integer.parseInt(size);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(CERTIFICATE_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
+        }
+        Page<GiftCertificate> giftCertificatePage = giftCertificateService.sortGiftCertificate(sort, numPage, numSize);
+        if (!giftCertificatePage.getList().isEmpty()) {
+            PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(giftCertificatePage, giftCertificateModelAssembler);
+            return new ResponseEntity<>(certificateModels, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
     }
 
     @PutMapping("/{certificateId}")

@@ -64,9 +64,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findGiftCertificatesByTagName(String name) {
+    public List<GiftCertificate> findGiftCertificatesByTagNameWithOffsetAndLimit(String name, int offset, int limit) {
         return entityManager.createQuery("SELECT gc FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name order by gc.id", GiftCertificate.class)
                 .setParameter(ColumnName.NAME, name)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 
@@ -117,16 +119,49 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findGiftCertificatesWithOffsetAndLimit(int offset, int limit) {
-        return null;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
+        Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        cq.orderBy(cb.asc(root.get(ColumnName.ID)));
+        return entityManager.createQuery(cq.select(root))
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
     @Override
     public List<GiftCertificate> findGiftCertificatesWithOffsetAndLimitOrderBy(int offset, int limit, Sort sort) {
-        return null;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
+        Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        switch (sort.getDirection()) {
+            case ASC: {
+                cq.orderBy(cb.asc(root.get(sort.getProperty())));
+                break;
+            }
+            case DESC: {
+                cq.orderBy(cb.desc(root.get(sort.getProperty())));
+                break;
+            }
+        }
+        return entityManager.createQuery(cq.select(root))
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
     @Override
     public long countGiftCertificate() {
-        return 0;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        cq.select(cb.count(cq.from(GiftCertificate.class)));
+        return entityManager.createQuery(cq).getSingleResult();
+    }
+
+    @Override
+    public long countGiftCertificateByTagName(String name) {
+        return entityManager.createQuery("SELECT count(t.name) FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name", Long.class)
+                .setParameter(ColumnName.NAME, name)
+                .getSingleResult();
     }
 }

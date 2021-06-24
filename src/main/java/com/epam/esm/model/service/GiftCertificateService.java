@@ -1,6 +1,7 @@
 package com.epam.esm.model.service;
 
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface GiftCertificateService {
 
     List<GiftCertificate> findAllGiftCertificate();
 
+    Page<GiftCertificate> findGiftCertificates(int page, int size);
+
     Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate, Long id);
 
     Optional<GiftCertificate> updatePartGiftCertificate(GiftCertificate giftCertificate, Long id);
@@ -23,9 +26,9 @@ public interface GiftCertificateService {
 
     boolean deleteGiftCertificate(Long id);
 
-    List<GiftCertificate> findGiftCertificateByTagName(String name);
+    Page<GiftCertificate> findGiftCertificateByTagName(String name, int page, int size);
 
     List<GiftCertificate> searchGiftCertificate(String filter);
 
-    List<GiftCertificate> sortGiftCertificate(String sort);
+    Page<GiftCertificate> sortGiftCertificate(String sort, int page, int size);
 }

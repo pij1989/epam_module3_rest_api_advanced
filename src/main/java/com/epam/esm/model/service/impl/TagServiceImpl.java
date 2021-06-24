@@ -4,6 +4,7 @@ import com.epam.esm.model.dao.TagDao;
 import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.service.TagService;
+import com.epam.esm.util.PaginationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class TagServiceImpl implements TagService {
         int totalPages = 0;
         if (totalElements > 0) {
             tags = tagDao.findTagsWithLimitAndOffset(offset, size);
-            totalPages = (int) (totalElements % size == 0 ? totalElements / size : (totalElements / size) + 1);
+            totalPages = PaginationUtil.defineTotalPages(totalElements,size);
         }
         return new Page<>(tags, totalPages, totalElements, page, size);
     }

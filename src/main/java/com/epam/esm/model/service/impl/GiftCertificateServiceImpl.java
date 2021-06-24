@@ -3,12 +3,18 @@ package com.epam.esm.model.service.impl;
 import com.epam.esm.model.dao.GiftCertificateDao;
 import com.epam.esm.model.dao.TagDao;
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Page;
+import com.epam.esm.model.entity.Sort;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.service.GiftCertificateService;
+import com.epam.esm.util.PaginationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    public static final Logger logger = LoggerFactory.getLogger(GiftCertificateServiceImpl.class);
     private static final String COMMA_DELIMITER = ",";
     private static final String ASC = "asc";
     private static final String DESC = "desc";
@@ -49,6 +56,20 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public List<GiftCertificate> findAllGiftCertificate() {
         return giftCertificateDao.findAll();
+    }
+
+    @Override
+    @Transactional
+    public Page<GiftCertificate> findGiftCertificates(int page, int size) {
+        List<GiftCertificate> giftCertificates = new ArrayList<>();
+        int offset = (page - 1) * size;
+        long totalElements = giftCertificateDao.countGiftCertificate();
+        int totalPages = 0;
+        if (totalElements > 0) {
+            giftCertificates = giftCertificateDao.findGiftCertificatesWithOffsetAndLimit(offset, size);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
+        return new Page<>(giftCertificates, totalPages, totalElements, page, size);
     }
 
     @Override
@@ -110,8 +131,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     @Transactional
-    public List<GiftCertificate> findGiftCertificateByTagName(String name) {
-        return giftCertificateDao.findGiftCertificatesByTagName(name);
+    public Page<GiftCertificate> findGiftCertificateByTagName(String name, int page, int size) {
+        List<GiftCertificate> certificates = new ArrayList<>();
+        int offset = (page - 1) * size;
+        long totalElements = giftCertificateDao.countGiftCertificateByTagName(name);
+        int totalPages = 0;
+        if (totalElements > 0) {
+            certificates = giftCertificateDao.findGiftCertificatesByTagNameWithOffsetAndLimit(name, offset, size);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
+        return new Page<>(certificates, totalPages, totalElements, page, size);
     }
 
     @Override
@@ -122,12 +151,28 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     @Transactional
-    public List<GiftCertificate> sortGiftCertificate(String sort) {
+    public Page<GiftCertificate> sortGiftCertificate(String sort, int page, int size) {
+        List<GiftCertificate> giftCertificates = new ArrayList<>();
         String[] requestParameters = sort.split(COMMA_DELIMITER);
         String type = requestParameters[0].trim();
-        String order = requestParameters[1].trim().toLowerCase();
-        List<GiftCertificate> giftCertificates = giftCertificateDao.findAll();
-        switch (type) {
+        String order = requestParameters[1].trim().toUpperCase();
+        Sort.Direction direction;
+        try {
+            direction = Sort.Direction.valueOf(order);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid order of sorting: " + order, e);
+            direction = Sort.Direction.ASC;
+        }
+        Sort sorting = new Sort(type, direction);
+        int offset = (page - 1) * size;
+        long totalElements = giftCertificateDao.countGiftCertificate();
+        int totalPages = 0;
+        if (totalElements > 0) {
+            giftCertificates = giftCertificateDao.findGiftCertificatesWithOffsetAndLimitOrderBy(offset, size, sorting);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
+        return new Page<>(giftCertificates, totalPages, totalElements, page, size);
+        /*switch (type) {
             case NAME: {
                 return sort(giftCertificates, Comparator.comparing(GiftCertificate::getName), order);
             }
@@ -137,7 +182,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             default: {
                 return giftCertificates;
             }
-        }
+        }*/
     }
 
     private List<GiftCertificate> sort(List<GiftCertificate> giftCertificates, Comparator<GiftCertificate> comparator, String order) {

@@ -22,14 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.controller.RequestParameter.*;
 import static com.epam.esm.model.error.MessageKeyError.*;
 
 @RestController
 @RequestMapping(value = "/tags", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE})
 public class TagController {
     private static final Logger logger = LogManager.getLogger(TagController.class);
-    private static final String DEFAULT_PAGE_NUMBER = "1";
-    private static final String DEFAULT_PAGE_SIZE = "5";
     private final TagService tagService;
     private final TagModelAssembler tagModelAssembler;
 
