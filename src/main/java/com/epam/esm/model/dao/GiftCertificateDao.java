@@ -3,6 +3,7 @@ package com.epam.esm.model.dao;
 import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Sort;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,6 @@ public interface GiftCertificateDao extends BaseDao<Long, GiftCertificate> {
     long countGiftCertificateByTagName(String name);
 
     long countGiftCertificateLikeNameOrDescription(String filter);
+
+    Optional<GiftCertificate> updatePrice(long id, BigDecimal price);
 }

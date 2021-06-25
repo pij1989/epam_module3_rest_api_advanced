@@ -4,6 +4,7 @@ import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,4 +32,6 @@ public interface GiftCertificateService {
     Page<GiftCertificate> searchGiftCertificate(String filter, int page, int size);
 
     Page<GiftCertificate> sortGiftCertificate(String sort, String order, int page, int size);
+
+    Optional<GiftCertificate> updatePriceGiftCertificate(BigDecimal price, long id);
 }

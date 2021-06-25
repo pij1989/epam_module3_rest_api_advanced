@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +79,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
         Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        cq.orderBy(cb.asc(root.get(ColumnName.ID)));
         cq.select(root).where(cb.or(cb.like(cb.upper(root.get(ColumnName.NAME)), parameter),
                 cb.like(cb.upper(root.get(ColumnName.DESCRIPTION)), parameter)));
         return entityManager.createQuery(cq)
@@ -170,6 +172,20 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long countGiftCertificateLikeNameOrDescription(String filter) {
-        return 0;
+        String parameter = PERCENT + filter.toUpperCase() + PERCENT;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        cq.select(cb.count(root)).where(cb.or(cb.like(cb.upper(root.get(ColumnName.NAME)), parameter),
+                cb.like(cb.upper(root.get(ColumnName.DESCRIPTION)), parameter)));
+        return entityManager.createQuery(cq).getSingleResult();
+    }
+
+    @Override
+    public Optional<GiftCertificate> updatePrice(long id, BigDecimal price) {
+        GiftCertificate giftCertificate = entityManager.find(GiftCertificate.class, id);
+        giftCertificate.setPrice(price);
+        entityManager.flush();
+        return Optional.of(giftCertificate);
     }
 }

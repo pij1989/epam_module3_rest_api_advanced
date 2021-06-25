@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -176,5 +177,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             totalPages = PaginationUtil.defineTotalPages(totalElements, size);
         }
         return new Page<>(giftCertificates, totalPages, totalElements, page, size);
+    }
+
+    @Override
+    @Transactional
+    public Optional<GiftCertificate> updatePriceGiftCertificate(BigDecimal price, long id) {
+        if (price == null) {
+            return Optional.empty();
+        }
+        Optional<GiftCertificate> optionalGiftCertificate = giftCertificateDao.findById(id);
+        if (optionalGiftCertificate.isPresent()) {
+            return giftCertificateDao.updatePrice(id,price);
+        }
+        return Optional.empty();
     }
 }

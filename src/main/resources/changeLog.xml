@@ -42,4 +42,41 @@
             )
         </sql>
     </changeSet>
+    <changeSet id="4" author="Dmitri">
+        <sql>
+            CREATE TYPE role_type AS enum('ADMIN','USER','GUEST');
+
+            CREATE TABLE public.roles
+            (
+            id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+            name role_type,
+            CONSTRAINT roles_pkey PRIMARY KEY (id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="5" author="Dmitri">
+        <sql>
+            INSERT INTO roles(name) VALUES ('ADMIN');
+            INSERT INTO roles(name) VALUES ('USER');
+            INSERT INTO roles(name) VALUES ('GUEST');
+        </sql>
+    </changeSet>
+    <changeSet id="6" author="Dmitri">
+        <sql>
+            CREATE TYPE user_status_type AS enum('ACTIVE','BLOCKED');
+
+            CREATE TABLE public.statuses
+            (
+            id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+            name user_status_type,
+            CONSTRAINT statuses_pkey PRIMARY KEY (id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="7" author="Dmitri">
+        <sql>
+            INSERT INTO statuses(name) VALUES ('ACTIVE');
+            INSERT INTO statuses(name) VALUES ('BLOCKED');
+        </sql>
+    </changeSet>
 </databaseChangeLog>

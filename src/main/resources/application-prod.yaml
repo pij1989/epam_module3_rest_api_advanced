@@ -6,6 +6,7 @@ spring:
     encoding: UTF-8
   liquibase:
     change-log: ${path.changelog:changeLog.xml}
+    enabled: true
   datasource:
     username: ${datasource.username:postgres}
     password: ${datasource.password:1234}
