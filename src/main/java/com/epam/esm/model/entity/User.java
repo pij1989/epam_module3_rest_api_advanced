@@ -1,6 +1,8 @@
 package com.epam.esm.model.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @javax.persistence.Entity(name = "users")
 public class User implements Entity {
@@ -20,6 +22,8 @@ public class User implements Entity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "status_id")
     private Status status;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Order> orders = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -85,6 +89,24 @@ public class User implements Entity {
         this.status = status;
     }
 
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setUser(this);
+    }
+
+    public void removeOrder(Order order) {
+        orders.remove(order);
+        order.setUser(null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,8 +120,9 @@ public class User implements Entity {
         if (login != null ? !login.equals(user.login) : user.login != null) return false;
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (password != null ? !password.equals(user.password) : user.password != null) return false;
-        if (role != user.role) return false;
-        return status == user.status;
+        if (role != null ? !role.equals(user.role) : user.role != null) return false;
+        if (status != null ? !status.equals(user.status) : user.status != null) return false;
+        return orders != null ? orders.equals(user.orders) : user.orders == null;
     }
 
     @Override
@@ -112,6 +135,7 @@ public class User implements Entity {
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (orders != null ? orders.hashCode() : 0);
         return result;
     }
 
@@ -126,6 +150,7 @@ public class User implements Entity {
         sb.append(", password='").append(password).append('\'');
         sb.append(", role=").append(role);
         sb.append(", status=").append(status);
+        sb.append(", orders=").append(orders);
         sb.append('}');
         return sb.toString();
     }

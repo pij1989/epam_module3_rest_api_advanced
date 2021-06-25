@@ -5,7 +5,8 @@ spring:
     basename: messages
     encoding: UTF-8
   liquibase:
-    enabled: false
+    enabled: true
+    change-log: changeLog.xml
 logging:
   level:
     org:

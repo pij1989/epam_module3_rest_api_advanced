@@ -79,4 +79,54 @@
             INSERT INTO statuses(name) VALUES ('BLOCKED');
         </sql>
     </changeSet>
+    <changeSet id="8" author="Dmitri">
+        <sql>
+            CREATE TABLE users
+            (
+            id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+            first_name character varying(100),
+            last_name character varying(100),
+            login character varying(100) NOT NULL,
+            email character varying(100) NOT NULL,
+            password character varying(100) NOT NULL,
+            role_id bigint NOT NULL,
+            status_id bigint NOT NULL,
+            CONSTRAINT users_pkey PRIMARY KEY (id),
+            CONSTRAINT users_role_id_fk FOREIGN KEY (role_id)
+            REFERENCES public.roles (id) ON DELETE CASCADE,
+            CONSTRAINT users_status_id_fk FOREIGN KEY (status_id)
+            REFERENCES public.statuses (id) ON DELETE CASCADE
+            )
+        </sql>
+    </changeSet>
+    <changeSet id="9" author="Dmitri">
+        <sql>
+            CREATE TABLE orders
+            (
+            id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+            cost numeric(19,2),
+            create_date timestamp without time zone NOT NULL,
+            user_id bigint NOT NULL,
+            CONSTRAINT orders_pkey PRIMARY KEY (id),
+            CONSTRAINT orders_user_id_fk FOREIGN KEY (user_id)
+            REFERENCES public.users (id) ON DELETE CASCADE
+            )
+        </sql>
+    </changeSet>
+    <changeSet id="10" author="Dmitri">
+        <sql>
+            CREATE TABLE order_gift_certificates
+            (
+            id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+            amount int NOT NULL,
+            order_id bigint NOT NULL,
+            gift_certificate_id bigint NOT NULL,
+            CONSTRAINT order_gift_certificates_pkey PRIMARY KEY (id),
+            CONSTRAINT order_gift_certificates_order_id_fk FOREIGN KEY (order_id)
+            REFERENCES public.orders (id) ON DELETE CASCADE,
+            CONSTRAINT order_gift_certificates_gift_certificate_id_fk FOREIGN KEY (gift_certificate_id)
+            REFERENCES public.gift_certificate (id) ON DELETE CASCADE
+            )
+        </sql>
+    </changeSet>
 </databaseChangeLog>

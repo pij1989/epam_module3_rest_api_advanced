@@ -1,12 +1,12 @@
 package com.epam.esm.model.entity;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @javax.persistence.Entity(name = "gift_certificate")
 public class GiftCertificate implements Entity {
@@ -28,6 +28,8 @@ public class GiftCertificate implements Entity {
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
     )
     private List<Tag> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "giftCertificate",cascade = CascadeType.ALL)
+    private Set<OrderGiftCertificate> orderGiftCertificates = new HashSet<>();
 
     public GiftCertificate() {
     }
@@ -96,6 +98,14 @@ public class GiftCertificate implements Entity {
         this.tags = tags;
     }
 
+    public Set<OrderGiftCertificate> getOrderGiftCertificates() {
+        return orderGiftCertificates;
+    }
+
+    public void setOrderGiftCertificates(Set<OrderGiftCertificate> orderGiftCertificates) {
+        this.orderGiftCertificates = orderGiftCertificates;
+    }
+
     public void addTag(Tag tag) {
         tags.add(tag);
         tag.getGiftCertificates().add(this);
@@ -104,6 +114,16 @@ public class GiftCertificate implements Entity {
     public void removeTag(Tag tag) {
         tags.remove(tag);
         tag.getGiftCertificates().remove(this);
+    }
+
+    public void addOrderGiftCertificate(OrderGiftCertificate orderGiftCertificate){
+        orderGiftCertificates.add(orderGiftCertificate);
+        orderGiftCertificate.setGiftCertificate(this);
+    }
+
+    public void removeOrderGiftCertificate(OrderGiftCertificate orderGiftCertificate){
+        orderGiftCertificates.remove(orderGiftCertificate);
+        orderGiftCertificate.setGiftCertificate(null);
     }
 
     @Override
@@ -121,7 +141,8 @@ public class GiftCertificate implements Entity {
         if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
         if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
             return false;
-        return tags != null ? tags.equals(that.tags) : that.tags == null;
+        if (tags != null ? !tags.equals(that.tags) : that.tags != null) return false;
+        return orderGiftCertificates != null ? orderGiftCertificates.equals(that.orderGiftCertificates) : that.orderGiftCertificates == null;
     }
 
     @Override
@@ -134,6 +155,7 @@ public class GiftCertificate implements Entity {
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
         result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
         result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (orderGiftCertificates != null ? orderGiftCertificates.hashCode() : 0);
         return result;
     }
 
@@ -148,6 +170,7 @@ public class GiftCertificate implements Entity {
         sb.append(", createDate=").append(createDate);
         sb.append(", lastUpdateDate=").append(lastUpdateDate);
         sb.append(", tags=").append(tags);
+        sb.append(", orderGiftCertificates=").append(orderGiftCertificates);
         sb.append('}');
         return sb.toString();
     }
