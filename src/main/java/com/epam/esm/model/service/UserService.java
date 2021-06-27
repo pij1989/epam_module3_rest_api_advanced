@@ -8,4 +8,6 @@ public interface UserService {
     Optional<User> createUser(User user);
 
     Optional<User> findUser(Long id);
+
+    Optional<User> addOrderToUser(Long userId, Long orderId);
 }

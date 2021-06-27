@@ -26,18 +26,17 @@ public class TagModelAssembler implements RepresentationModelAssembler<Tag, TagM
 
     @Override
     public TagModel toModel(Tag entity) {
+        TagModel tagModel = new TagModel();
         try {
-            TagModel tagModel = new TagModel();
             tagModel.add(linkTo(methodOn(TagController.class)
                     .findTag(entity.getId().toString())).withSelfRel());
-            tagModel.setId(entity.getId());
-            tagModel.setName(entity.getName());
-            tagModel.setGiftCertificates(toGiftCertificateModel(entity.getGiftCertificates()));
-            return tagModel;
         } catch (NotFoundException | BadRequestException e) {
             logger.error(e.getMessage());
-            throw new RuntimeException(e);
         }
+        tagModel.setId(entity.getId());
+        tagModel.setName(entity.getName());
+        tagModel.setGiftCertificates(toGiftCertificateModel(entity.getGiftCertificates()));
+        return tagModel;
     }
 
     private List<GiftCertificateModel> toGiftCertificateModel(List<GiftCertificate> giftCertificates) {

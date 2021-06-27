@@ -33,23 +33,22 @@ public class GiftCertificateModelAssembler implements RepresentationModelAssembl
 
     @Override
     public GiftCertificateModel toModel(GiftCertificate entity) {
+        GiftCertificateModel giftCertificateModel = new GiftCertificateModel();
         try {
-            GiftCertificateModel giftCertificateModel = new GiftCertificateModel();
             giftCertificateModel.add(linkTo(methodOn(GiftCertificateController.class)
                     .findGiftCertificate(entity.getId().toString())).withSelfRel());
-            giftCertificateModel.setId(entity.getId());
-            giftCertificateModel.setName(entity.getName());
-            giftCertificateModel.setDescription(entity.getDescription());
-            giftCertificateModel.setPrice(entity.getPrice());
-            giftCertificateModel.setDuration(entity.getDuration());
-            giftCertificateModel.setCreateDate(entity.getCreateDate());
-            giftCertificateModel.setLastUpdateDate(entity.getLastUpdateDate());
-            giftCertificateModel.setTags(toTagModel(entity.getTags()));
-            return giftCertificateModel;
-        } catch (NotFoundException | BadRequestException e) {
+        } catch (BadRequestException | NotFoundException e) {
             logger.error(e.getMessage());
-            throw new RuntimeException(e);
         }
+        giftCertificateModel.setId(entity.getId());
+        giftCertificateModel.setName(entity.getName());
+        giftCertificateModel.setDescription(entity.getDescription());
+        giftCertificateModel.setPrice(entity.getPrice());
+        giftCertificateModel.setDuration(entity.getDuration());
+        giftCertificateModel.setCreateDate(entity.getCreateDate());
+        giftCertificateModel.setLastUpdateDate(entity.getLastUpdateDate());
+        giftCertificateModel.setTags(toTagModel(entity.getTags()));
+        return giftCertificateModel;
     }
 
     private List<TagModel> toTagModel(List<Tag> tags) {

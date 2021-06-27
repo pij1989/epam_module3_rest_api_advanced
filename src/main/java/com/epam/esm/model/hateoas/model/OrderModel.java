@@ -13,7 +13,7 @@ public class OrderModel extends RepresentationModel<OrderModel> {
     private BigDecimal cost;
     private LocalDateTime createDate;
     private User user;
-    Set<OrderItemModel> orderItemModels = new HashSet<>();
+    Set<OrderItemModel> orderItems = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -47,12 +47,12 @@ public class OrderModel extends RepresentationModel<OrderModel> {
         this.user = user;
     }
 
-    public Set<OrderItemModel> getOrderItemModels() {
-        return orderItemModels;
+    public Set<OrderItemModel> getOrderItems() {
+        return orderItems;
     }
 
-    public void setOrderItemModels(Set<OrderItemModel> orderItemModels) {
-        this.orderItemModels = orderItemModels;
+    public void setOrderItems(Set<OrderItemModel> orderItems) {
+        this.orderItems = orderItems;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class OrderModel extends RepresentationModel<OrderModel> {
         if (cost != null ? !cost.equals(that.cost) : that.cost != null) return false;
         if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
         if (user != null ? !user.equals(that.user) : that.user != null) return false;
-        return orderItemModels != null ? orderItemModels.equals(that.orderItemModels) : that.orderItemModels == null;
+        return orderItems != null ? orderItems.equals(that.orderItems) : that.orderItems == null;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class OrderModel extends RepresentationModel<OrderModel> {
         result = 31 * result + (cost != null ? cost.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (orderItemModels != null ? orderItemModels.hashCode() : 0);
+        result = 31 * result + (orderItems != null ? orderItems.hashCode() : 0);
         return result;
     }
 
@@ -88,7 +88,7 @@ public class OrderModel extends RepresentationModel<OrderModel> {
         sb.append(", cost=").append(cost);
         sb.append(", createDate=").append(createDate);
         sb.append(", user=").append(user);
-        sb.append(", orderItemModels=").append(orderItemModels);
+        sb.append(", orderItemModels=").append(orderItems);
         sb.append('}');
         return sb.toString();
     }

@@ -64,4 +64,26 @@ public class UserController {
             throw new NotFoundException(NOT_FOUND, new Object[]{});
         }
     }
+
+    @PutMapping("/{userId}/orders/{orderId}")
+    public ResponseEntity<UserModel> addOrderToUser(@PathVariable String userId,
+                                                    @PathVariable String orderId) throws BadRequestException, NotFoundException {
+        long parseUserId;
+        long parseOrderId;
+        try {
+            parseUserId = Long.parseLong(userId);
+            parseOrderId = Long.parseLong(orderId);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(BAD_REQUEST, e, new Object[]{});
+        }
+        Optional<User> optionalUser = userService.addOrderToUser(parseUserId, parseOrderId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            UserModel userModel = userModelAssembler.toModel(user);
+            return new ResponseEntity<>(userModel, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
+    }
 }

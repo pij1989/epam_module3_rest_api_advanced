@@ -72,26 +72,22 @@ public class OrderItem implements Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OrderItem that = (OrderItem) o;
+        OrderItem orderItem = (OrderItem) o;
 
-        if (amount != that.amount) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (order != null ? !order.equals(that.order) : that.order != null) return false;
-        return giftCertificate != null ? giftCertificate.equals(that.giftCertificate) : that.giftCertificate == null;
+        if (amount != orderItem.amount) return false;
+        return id != null ? id.equals(orderItem.id) : orderItem.id == null;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (order != null ? order.hashCode() : 0);
-        result = 31 * result + (giftCertificate != null ? giftCertificate.hashCode() : 0);
         result = 31 * result + amount;
         return result;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("OrderGiftCertificate{");
+        final StringBuilder sb = new StringBuilder("OrderItem{");
         sb.append("id=").append(id);
         sb.append(", amount=").append(amount);
         sb.append('}');

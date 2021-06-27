@@ -80,7 +80,6 @@ public class Order implements Entity {
         if (id != null ? !id.equals(order.id) : order.id != null) return false;
         if (cost != null ? !cost.equals(order.cost) : order.cost != null) return false;
         if (createDate != null ? !createDate.equals(order.createDate) : order.createDate != null) return false;
-        if (user != null ? !user.equals(order.user) : order.user != null) return false;
         return orderItems != null ? orderItems.equals(order.orderItems) : order.orderItems == null;
     }
 
@@ -89,7 +88,6 @@ public class Order implements Entity {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (cost != null ? cost.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
         result = 31 * result + (orderItems != null ? orderItems.hashCode() : 0);
         return result;
     }
@@ -100,7 +98,6 @@ public class Order implements Entity {
         sb.append("id=").append(id);
         sb.append(", cost=").append(cost);
         sb.append(", createDate=").append(createDate);
-        sb.append(", user=").append(user);
         sb.append(", orderItems=").append(orderItems);
         sb.append('}');
         return sb.toString();

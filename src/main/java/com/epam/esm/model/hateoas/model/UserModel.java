@@ -19,7 +19,7 @@ public class UserModel extends RepresentationModel<UserModel> {
     private Role role;
     @JsonIgnoreProperties(value = "id")
     private Status status;
-    private Set<OrderModel> orderModels = new HashSet<>();
+    private Set<OrderModel> orders = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -85,12 +85,12 @@ public class UserModel extends RepresentationModel<UserModel> {
         this.status = status;
     }
 
-    public Set<OrderModel> getOrderModels() {
-        return orderModels;
+    public Set<OrderModel> getOrders() {
+        return orders;
     }
 
-    public void setOrderModels(Set<OrderModel> orderModels) {
-        this.orderModels = orderModels;
+    public void setOrders(Set<OrderModel> orders) {
+        this.orders = orders;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class UserModel extends RepresentationModel<UserModel> {
         if (password != null ? !password.equals(userModel.password) : userModel.password != null) return false;
         if (role != null ? !role.equals(userModel.role) : userModel.role != null) return false;
         if (status != null ? !status.equals(userModel.status) : userModel.status != null) return false;
-        return orderModels != null ? orderModels.equals(userModel.orderModels) : userModel.orderModels == null;
+        return orders != null ? orders.equals(userModel.orders) : userModel.orders == null;
     }
 
     @Override
@@ -123,7 +123,7 @@ public class UserModel extends RepresentationModel<UserModel> {
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (orderModels != null ? orderModels.hashCode() : 0);
+        result = 31 * result + (orders != null ? orders.hashCode() : 0);
         return result;
     }
 
@@ -138,7 +138,7 @@ public class UserModel extends RepresentationModel<UserModel> {
         sb.append(", password='").append(password).append('\'');
         sb.append(", role=").append(role);
         sb.append(", status=").append(status);
-        sb.append(", orderModels=").append(orderModels);
+        sb.append(", orderModels=").append(orders);
         sb.append('}');
         return sb.toString();
     }

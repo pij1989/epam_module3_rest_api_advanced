@@ -43,7 +43,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> update(User entity) {
-        throw new UnsupportedOperationException("Unsupported operation 'update' for UserDao");
+        User user = entityManager.merge(entity);
+        return Optional.ofNullable(user);
     }
 
     @Override

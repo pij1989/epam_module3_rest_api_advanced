@@ -228,7 +228,7 @@ public class GiftCertificateController {
             parseTagId = Long.parseLong(tagId);
         } catch (NumberFormatException e) {
             logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(CERTIFICATE_BAD_REQUEST, e, new Object[]{tagId});
+            throw new BadRequestException(TAG_BAD_REQUEST, e, new Object[]{tagId});
         }
         if (giftCertificateService.addTagToGiftCertificate(parseCertificateId, parseTagId)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
