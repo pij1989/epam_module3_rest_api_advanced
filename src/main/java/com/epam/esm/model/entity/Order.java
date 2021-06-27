@@ -18,7 +18,7 @@ public class Order implements Entity {
     @JoinColumn(name = "user_id")
     private User user;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    Set<OrderGiftCertificate> orderGiftCertificates = new HashSet<>();
+    Set<OrderItem> orderItems = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -52,22 +52,22 @@ public class Order implements Entity {
         this.user = user;
     }
 
-    public Set<OrderGiftCertificate> getOrderGiftCertificates() {
-        return orderGiftCertificates;
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
-    public void setOrderGiftCertificates(Set<OrderGiftCertificate> orderGiftCertificates) {
-        this.orderGiftCertificates = orderGiftCertificates;
+    public void setOrderItems(Set<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 
-    public void addOrderGiftCertificate(OrderGiftCertificate orderGiftCertificate){
-        orderGiftCertificates.add(orderGiftCertificate);
-        orderGiftCertificate.setOrder(this);
+    public void addOrderItem(OrderItem orderItem){
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
     }
 
-    public void removeOrderGiftCertificate(OrderGiftCertificate orderGiftCertificate){
-        orderGiftCertificates.remove(orderGiftCertificate);
-        orderGiftCertificate.setOrder(null);
+    public void removeOrderItem(OrderItem orderItem){
+        orderItems.remove(orderItem);
+        orderItem.setOrder(null);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Order implements Entity {
         if (cost != null ? !cost.equals(order.cost) : order.cost != null) return false;
         if (createDate != null ? !createDate.equals(order.createDate) : order.createDate != null) return false;
         if (user != null ? !user.equals(order.user) : order.user != null) return false;
-        return orderGiftCertificates != null ? orderGiftCertificates.equals(order.orderGiftCertificates) : order.orderGiftCertificates == null;
+        return orderItems != null ? orderItems.equals(order.orderItems) : order.orderItems == null;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class Order implements Entity {
         result = 31 * result + (cost != null ? cost.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (orderGiftCertificates != null ? orderGiftCertificates.hashCode() : 0);
+        result = 31 * result + (orderItems != null ? orderItems.hashCode() : 0);
         return result;
     }
 
@@ -101,7 +101,7 @@ public class Order implements Entity {
         sb.append(", cost=").append(cost);
         sb.append(", createDate=").append(createDate);
         sb.append(", user=").append(user);
-        sb.append(", orderGiftCertificates=").append(orderGiftCertificates);
+        sb.append(", orderItems=").append(orderItems);
         sb.append('}');
         return sb.toString();
     }

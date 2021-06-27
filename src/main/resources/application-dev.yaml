@@ -18,3 +18,4 @@ logging:
         esm:
           configuration:
             DevDatasourceConfiguration: TRACE
+          controller: DEBUG

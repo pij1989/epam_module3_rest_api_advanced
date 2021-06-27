@@ -2,8 +2,8 @@ package com.epam.esm.model.entity;
 
 import javax.persistence.*;
 
-@javax.persistence.Entity(name = "order_gift_certificates")
-public class OrderGiftCertificate implements Entity {
+@javax.persistence.Entity(name = "order_items")
+public class OrderItem implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,22 +49,22 @@ public class OrderGiftCertificate implements Entity {
 
     public void addOrder(Order order) {
         this.order = order;
-        order.getOrderGiftCertificates().add(this);
+        order.getOrderItems().add(this);
     }
 
     public void removeOrder(Order order){
         this.order = null;
-        order.getOrderGiftCertificates().remove(this);
+        order.getOrderItems().remove(this);
     }
 
     public void addGiftCertificate(GiftCertificate giftCertificate){
         this.giftCertificate = giftCertificate;
-        giftCertificate.getOrderGiftCertificates().add(this);
+        giftCertificate.getOrderItems().add(this);
     }
 
     public void removeGiftCertificate(GiftCertificate giftCertificate){
         this.order = null;
-        giftCertificate.getOrderGiftCertificates().remove(this);
+        giftCertificate.getOrderItems().remove(this);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class OrderGiftCertificate implements Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OrderGiftCertificate that = (OrderGiftCertificate) o;
+        OrderItem that = (OrderItem) o;
 
         if (amount != that.amount) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;

@@ -14,9 +14,11 @@ import com.epam.esm.model.service.GiftCertificateService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +30,7 @@ import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_SIZE;
 import static com.epam.esm.model.error.MessageKeyError.*;
 
 @RestController
-@RequestMapping("/gift_certificates")
+@RequestMapping(value = "/gift_certificates", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE})
 public class GiftCertificateController {
     private static final Logger logger = LogManager.getLogger(GiftCertificate.class);
     private final GiftCertificateService giftCertificateService;
@@ -160,7 +162,7 @@ public class GiftCertificateController {
 
     @PutMapping("/{certificateId}")
     public ResponseEntity<GiftCertificateModel> updateGiftCertificate(@RequestBody GiftCertificate giftCertificate,
-                                                                 @PathVariable String certificateId) throws BadRequestException, NotFoundException {
+                                                                      @PathVariable String certificateId) throws BadRequestException, NotFoundException {
         logger.debug("Path variable: " + certificateId);
         long parseId;
         try {
@@ -176,7 +178,7 @@ public class GiftCertificateController {
 
     @PatchMapping("/{certificateId}")
     public ResponseEntity<GiftCertificateModel> updatePartOfGiftCertificate(@RequestBody GiftCertificate giftCertificate,
-                                                                       @PathVariable String certificateId) throws BadRequestException, NotFoundException {
+                                                                            @PathVariable String certificateId) throws BadRequestException, NotFoundException {
         logger.debug("Path variable: " + certificateId);
         long parseId;
         try {
@@ -253,8 +255,8 @@ public class GiftCertificateController {
     }
 
     @PatchMapping("/{certificateId}/price")
-    public ResponseEntity<GiftCertificateModel>updatePriceOfGiftCertificate(@RequestBody GiftCertificate giftCertificate,
-                                                                            @PathVariable String certificateId) throws BadRequestException, NotFoundException {
+    public ResponseEntity<GiftCertificateModel> updatePriceOfGiftCertificate(@RequestBody GiftCertificate giftCertificate,
+                                                                             @PathVariable String certificateId) throws BadRequestException, NotFoundException {
         long parseId;
         try {
             parseId = Long.parseLong(certificateId);

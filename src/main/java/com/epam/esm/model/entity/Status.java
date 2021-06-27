@@ -1,8 +1,13 @@
 package com.epam.esm.model.entity;
 
+import com.epam.esm.model.entity.type.PostgreSqlEnumType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.*;
 
 @javax.persistence.Entity(name = "statuses")
+@TypeDef(name = "enum_postgresql",typeClass = PostgreSqlEnumType.class)
 public class Status implements Entity {
 
     public enum StatusType {
@@ -14,6 +19,7 @@ public class Status implements Entity {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
+    @Type(type = "enum_postgresql")
     private StatusType statusType;
 
     public Long getId() {
