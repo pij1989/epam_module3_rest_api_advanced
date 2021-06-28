@@ -13,7 +13,7 @@ public class OrderItem implements Entity {
     @ManyToOne
     @JoinColumn(name = "gift_certificate_id")
     private GiftCertificate giftCertificate;
-    private int amount;
+    private int quantity;
 
     public Long getId() {
         return id;
@@ -39,12 +39,12 @@ public class OrderItem implements Entity {
         this.giftCertificate = giftCertificate;
     }
 
-    public int getAmount() {
-        return amount;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setQuantity(int amount) {
+        this.quantity = amount;
     }
 
     public void addOrder(Order order) {
@@ -74,14 +74,14 @@ public class OrderItem implements Entity {
 
         OrderItem orderItem = (OrderItem) o;
 
-        if (amount != orderItem.amount) return false;
+        if (quantity != orderItem.quantity) return false;
         return id != null ? id.equals(orderItem.id) : orderItem.id == null;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + amount;
+        result = 31 * result + quantity;
         return result;
     }
 
@@ -89,7 +89,7 @@ public class OrderItem implements Entity {
     public String toString() {
         final StringBuilder sb = new StringBuilder("OrderItem{");
         sb.append("id=").append(id);
-        sb.append(", amount=").append(amount);
+        sb.append(", quantity=").append(quantity);
         sb.append('}');
         return sb.toString();
     }

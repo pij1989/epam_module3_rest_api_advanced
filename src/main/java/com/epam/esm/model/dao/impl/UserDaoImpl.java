@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +41,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        return null;
+        return entityManager.createQuery("SELECT u FROM users u", User.class)
+                .getResultList();
     }
 
     @Override
@@ -50,5 +54,25 @@ public class UserDaoImpl implements UserDao {
     @Override
     public boolean deleteById(Long id) {
         throw new UnsupportedOperationException("Unsupported operation 'delete' for UserDao");
+    }
+
+    @Override
+    public List<User> findUsersWithLimitAndOffset(int offset, int limit) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.orderBy(cb.asc(root.get(ColumnName.ID)));
+        return entityManager.createQuery(cq.select(root))
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
+    public long countUser() {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        cq.select(cb.count(cq.from(User.class)));
+        return entityManager.createQuery(cq).getSingleResult();
     }
 }

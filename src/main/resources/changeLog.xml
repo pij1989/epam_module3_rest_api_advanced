@@ -6,17 +6,17 @@
 
     <changeSet id="1" author="Dmitri">
         <sql>
-            CREATE TABLE tag
+            CREATE TABLE tags
             (
             id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
             name character varying(100) NOT NULL,
-            CONSTRAINT tag_pkey PRIMARY KEY (id)
+            CONSTRAINT tags_pkey PRIMARY KEY (id)
             )
         </sql>
     </changeSet>
     <changeSet id="2" author="Dmitri">
         <sql>
-            CREATE TABLE gift_certificate
+            CREATE TABLE gift_certificates
             (
             id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
             name character varying(100) NOT NULL,
@@ -25,20 +25,20 @@
             duration int NOT NULL,
             create_date timestamp without time zone NOT NULL,
             last_update_date timestamp without time zone NOT NULL,
-            CONSTRAINT gift_certificate_pkey PRIMARY KEY (id)
+            CONSTRAINT gift_certificates_pkey PRIMARY KEY (id)
             )
         </sql>
     </changeSet>
     <changeSet id="3" author="Dmitri">
         <sql>
-            CREATE TABLE gift_certificate_tag
+            CREATE TABLE gift_certificate_tags
             (
             gift_certificate_id bigint NOT NULL,
             tag_id bigint NOT NULL,
-            CONSTRAINT gift_certificate_tag_gift_certificate_id_fk FOREIGN KEY (gift_certificate_id)
-            REFERENCES public.gift_certificate (id) ON DELETE CASCADE,
-            CONSTRAINT gift_certificate_tag_tag_id_fk FOREIGN KEY (tag_id)
-            REFERENCES public.tag (id) ON DELETE CASCADE
+            CONSTRAINT gift_certificate_tags_gift_certificate_id_fk FOREIGN KEY (gift_certificate_id)
+            REFERENCES public.gift_certificates (id) ON DELETE CASCADE,
+            CONSTRAINT gift_certificate_tags_tag_id_fk FOREIGN KEY (tag_id)
+            REFERENCES public.tags (id) ON DELETE CASCADE
             )
         </sql>
     </changeSet>
@@ -118,14 +118,14 @@
             CREATE TABLE order_items
             (
             id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-            amount int NOT NULL,
+            quantity int NOT NULL,
             order_id bigint NOT NULL,
             gift_certificate_id bigint NOT NULL,
             CONSTRAINT order_items_pkey PRIMARY KEY (id),
             CONSTRAINT order_items_order_id_fk FOREIGN KEY (order_id)
             REFERENCES public.orders (id) ON DELETE CASCADE,
             CONSTRAINT order_items_gift_certificate_id_fk FOREIGN KEY (gift_certificate_id)
-            REFERENCES public.gift_certificate (id) ON DELETE CASCADE
+            REFERENCES public.gift_certificates (id) ON DELETE CASCADE
             )
         </sql>
     </changeSet>

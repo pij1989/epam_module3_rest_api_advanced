@@ -14,6 +14,10 @@ public class MessageKeyError {
     public static final String BAD_REQUEST = "error.400.common";
     public static final String METHOD_NOT_ALLOWED = "error.405.common";
     public static final String INTERNAL_SERVER_ERROR = "error.500.common";
+    public static final String USER_NOT_FOUND = "error.404.user";
+    public static final String USERS_NOT_FOUND = "error.404.users";
+    public static final String ORDER_NOT_FOUND = "error.404.order";
+    public static final String USER_ORDERS_NOT_FOUND = "error.404.user.orders";
 
     private MessageKeyError() {
     }

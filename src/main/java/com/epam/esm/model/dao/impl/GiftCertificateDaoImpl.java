@@ -66,7 +66,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findGiftCertificatesByTagNameWithOffsetAndLimit(String name, int offset, int limit) {
-        return entityManager.createQuery("SELECT gc FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name order by gc.id", GiftCertificate.class)
+        return entityManager.createQuery("SELECT gc FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name order by gc.id", GiftCertificate.class)
                 .setParameter(ColumnName.NAME, name)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
@@ -102,7 +102,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findAll() {
-        return entityManager.createQuery("SELECT gc FROM gift_certificate gc order by gc.id", GiftCertificate.class)
+        return entityManager.createQuery("SELECT gc FROM gift_certificates gc order by gc.id", GiftCertificate.class)
                 .getResultList();
     }
 
@@ -165,7 +165,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long countGiftCertificateByTagName(String name) {
-        return entityManager.createQuery("SELECT count(t.name) FROM gift_certificate gc JOIN gc.tags t WHERE t.name = :name", Long.class)
+        return entityManager.createQuery("SELECT count(t.name) FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name", Long.class)
                 .setParameter(ColumnName.NAME, name)
                 .getSingleResult();
     }

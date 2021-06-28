@@ -7,7 +7,7 @@ import javax.persistence.ManyToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-@javax.persistence.Entity(name = "tag")
+@javax.persistence.Entity(name = "tags")
 public class Tag implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

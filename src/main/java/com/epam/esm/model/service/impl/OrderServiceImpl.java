@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
             if (optionalGiftCertificate.isPresent()) {
                 Order order = optionalOrder.get();
                 GiftCertificate giftCertificate = optionalGiftCertificate.get();
-                BigDecimal calculatedCost = calculateCost(giftCertificate.getPrice(), order.getCost(), orderItem.getAmount());
+                BigDecimal calculatedCost = calculateCost(giftCertificate.getPrice(), order.getCost(), orderItem.getQuantity());
                 order.setCost(calculatedCost);
                 orderItem.setOrder(order);
                 orderItem.addGiftCertificate(giftCertificate);
@@ -62,11 +62,11 @@ public class OrderServiceImpl implements OrderService {
         return Optional.empty();
     }
 
-    private BigDecimal calculateCost(BigDecimal price, BigDecimal totalCost, int amount) {
+    private BigDecimal calculateCost(BigDecimal price, BigDecimal totalCost, int quantity) {
         if (totalCost == null) {
             totalCost = BigDecimal.ZERO;
         }
-        BigDecimal itemCost = price.multiply(BigDecimal.valueOf(amount));
+        BigDecimal itemCost = price.multiply(BigDecimal.valueOf(quantity));
         return totalCost.add(itemCost);
     }
 }

@@ -19,7 +19,7 @@ public class OrderItemModelAssembler implements RepresentationModelAssembler<Ord
     @Override
     public OrderItemModel toModel(OrderItem entity) {
         OrderItemModel orderItemModel = new OrderItemModel();
-        orderItemModel.setAmount(entity.getAmount());
+        orderItemModel.setQuantity(entity.getQuantity());
         orderItemModel.setGiftCertificate(giftCertificateModelAssembler.toModel(entity.getGiftCertificate()));
         return orderItemModel;
     }

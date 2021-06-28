@@ -3,16 +3,16 @@ package com.epam.esm.model.hateoas.model;
 import org.springframework.hateoas.RepresentationModel;
 
 public class OrderItemModel extends RepresentationModel<OrderItemModel> {
-    private int amount;
+    private int quantity;
     private OrderModel order;
     private GiftCertificateModel giftCertificate;
 
-    public int getAmount() {
-        return amount;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public OrderModel getOrder() {
@@ -39,7 +39,7 @@ public class OrderItemModel extends RepresentationModel<OrderItemModel> {
 
         OrderItemModel that = (OrderItemModel) o;
 
-        if (amount != that.amount) return false;
+        if (quantity != that.quantity) return false;
         if (order != null ? !order.equals(that.order) : that.order != null) return false;
         return giftCertificate != null ? giftCertificate.equals(that.giftCertificate) : that.giftCertificate == null;
     }
@@ -47,7 +47,7 @@ public class OrderItemModel extends RepresentationModel<OrderItemModel> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + amount;
+        result = 31 * result + quantity;
         result = 31 * result + (order != null ? order.hashCode() : 0);
         result = 31 * result + (giftCertificate != null ? giftCertificate.hashCode() : 0);
         return result;
@@ -56,7 +56,7 @@ public class OrderItemModel extends RepresentationModel<OrderItemModel> {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("OrderItemModel{");
-        sb.append("amount=").append(amount);
+        sb.append("quantity=").append(quantity);
         sb.append(", orderModel=").append(order);
         sb.append(", giftCertificateModel=").append(giftCertificate);
         sb.append('}');

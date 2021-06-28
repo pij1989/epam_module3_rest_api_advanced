@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@javax.persistence.Entity(name = "gift_certificate")
+@javax.persistence.Entity(name = "gift_certificates")
 public class GiftCertificate implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class GiftCertificate implements Entity {
     private LocalDateTime lastUpdateDate;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
-            name = "gift_certificate_tag",
+            name = "gift_certificate_tags",
             joinColumns = {@JoinColumn(name = "gift_certificate_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
     )

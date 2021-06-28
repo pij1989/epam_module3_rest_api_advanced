@@ -31,7 +31,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findAll() {
-        return entityManager.createQuery("SELECT t from tag t", Tag.class)
+        return entityManager.createQuery("SELECT t from tags t", Tag.class)
                 .getResultList();
     }
 
