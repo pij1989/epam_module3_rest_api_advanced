@@ -3,7 +3,6 @@ package com.epam.esm.model.dao.impl;
 import com.epam.esm.model.dao.UserDao;
 import com.epam.esm.model.entity.Role;
 import com.epam.esm.model.entity.Status;
-import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -70,17 +69,12 @@ public class UserDaoImpl implements UserDao {
                 .getResultList();
     }
 
-
-
     @Override
-    public Tag findWidelyUsedTagForUserWithHighestCostOfAllOrders() {
-        Long userId = entityManager.createQuery("SELECT u.id FROM users u JOIN u.orders o GROUP BY u.id ORDER BY sum(o.cost) DESC", Long.class)
+    public Optional<User> findUserWithMaxSumCostOrders() {
+        User user = entityManager.createQuery("SELECT u FROM users u JOIN u.orders o GROUP BY u.id ORDER BY sum(o.cost) DESC", User.class)
                 .setMaxResults(1)
                 .getSingleResult();
-        return entityManager.createQuery("SELECT t FROM users u JOIN u.orders o JOIN o.orderItems oi JOIN oi.giftCertificate gc JOIN gc.tags t WHERE u.id = :userId GROUP BY t.id ORDER BY count(t.id) DESC", Tag.class)
-                .setParameter("userId", userId)
-                .setMaxResults(1)
-                .getSingleResult();
+        return Optional.ofNullable(user);
     }
 
     @Override

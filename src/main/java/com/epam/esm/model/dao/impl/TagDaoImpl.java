@@ -63,11 +63,19 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
+    public Optional<Tag> findMaxCountTagByUserId(Long userId) {
+        Tag tag = entityManager.createQuery("SELECT t FROM users u JOIN u.orders o JOIN o.orderItems oi JOIN oi.giftCertificate gc JOIN gc.tags t WHERE u.id = :userId GROUP BY t.id ORDER BY count(t.id) DESC", Tag.class)
+                .setParameter("userId", userId)
+                .setMaxResults(1)
+                .getSingleResult();
+        return Optional.ofNullable(tag);
+    }
+
+    @Override
     public long countTag() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         cq.select(cb.count(cq.from(Tag.class)));
         return entityManager.createQuery(cq).getSingleResult();
-//        return Math.toIntExact(entityManager.createQuery("SELECT count(t) FROM tag t", Long.class).getSingleResult());
     }
 }

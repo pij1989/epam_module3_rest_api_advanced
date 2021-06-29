@@ -1,6 +1,7 @@
 package com.epam.esm.model.service.impl;
 
 import com.epam.esm.model.dao.OrderDao;
+import com.epam.esm.model.dao.TagDao;
 import com.epam.esm.model.dao.UserDao;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.Page;
@@ -20,11 +21,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final OrderDao orderDao;
+    private final TagDao tagDao;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, OrderDao orderDao) {
+    public UserServiceImpl(UserDao userDao, OrderDao orderDao, TagDao tagDao) {
         this.userDao = userDao;
         this.orderDao = orderDao;
+        this.tagDao = tagDao;
     }
 
     @Override
@@ -118,7 +121,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Optional<Tag> findWidelyUsedTagForUserWithHighestCostOfAllOrders() {
-        Tag tag = userDao.findWidelyUsedTagForUserWithHighestCostOfAllOrders();
-        return Optional.ofNullable(tag);
+        Optional<User> optionalUser = userDao.findUserWithMaxSumCostOrders();
+        return optionalUser.map(User::getId)
+                .flatMap(tagDao::findMaxCountTagByUserId);
     }
 }
