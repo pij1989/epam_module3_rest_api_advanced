@@ -3,6 +3,7 @@ package com.epam.esm.model.dao.impl;
 import com.epam.esm.model.dao.UserDao;
 import com.epam.esm.model.entity.Role;
 import com.epam.esm.model.entity.Status;
+import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Repository
 public class UserDaoImpl implements UserDao {
+    //    SELECT t.id, count(t.id) FROM users u JOIN orders o ON o.user_id = u.id JOIN order_items oi ON oi.order_id = o.id JOIN gift_certificates gc ON gc.id = oi.gift_certificate_id JOIN gift_certificate_tags gct ON gct.gift_certificate_id = gc.id JOIN tags t ON t.id = gct.tag_id WHERE u.id = (SELECT u.id FROM users u JOIN orders o ON o.user_id = u.id GROUP BY u.id ORDER BY SUM(cost) DESC LIMIT 1) GROUP BY t.id ORDER BY count(t.id) DESC LIMIT 1;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -66,6 +68,19 @@ public class UserDaoImpl implements UserDao {
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
+    }
+
+
+
+    @Override
+    public Tag findWidelyUsedTagForUserWithHighestCostOfAllOrders() {
+        Long userId = entityManager.createQuery("SELECT u.id FROM users u JOIN u.orders o GROUP BY u.id ORDER BY sum(o.cost) DESC", Long.class)
+                .setMaxResults(1)
+                .getSingleResult();
+        return entityManager.createQuery("SELECT t FROM users u JOIN u.orders o JOIN o.orderItems oi JOIN oi.giftCertificate gc JOIN gc.tags t WHERE u.id = :userId GROUP BY t.id ORDER BY count(t.id) DESC", Tag.class)
+                .setParameter("userId", userId)
+                .setMaxResults(1)
+                .getSingleResult();
     }
 
     @Override

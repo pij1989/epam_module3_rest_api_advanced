@@ -3,12 +3,15 @@ package com.epam.esm.controller;
 import com.epam.esm.model.creator.PageModelCreator;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.Page;
+import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.entity.User;
 import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.assembler.OrderModelAssembler;
+import com.epam.esm.model.hateoas.assembler.TagModelAssembler;
 import com.epam.esm.model.hateoas.assembler.UserModelAssembler;
 import com.epam.esm.model.hateoas.model.OrderModel;
+import com.epam.esm.model.hateoas.model.TagModel;
 import com.epam.esm.model.hateoas.model.UserModel;
 import com.epam.esm.model.service.UserService;
 import org.slf4j.Logger;
@@ -33,12 +36,15 @@ public class UserController {
     private final UserService userService;
     private final UserModelAssembler userModelAssembler;
     private final OrderModelAssembler orderModelAssembler;
+    private final TagModelAssembler tagModelAssembler;
 
     @Autowired
-    public UserController(UserService userService, UserModelAssembler userModelAssembler, OrderModelAssembler orderModelAssembler) {
+    public UserController(UserService userService, UserModelAssembler userModelAssembler,
+                          OrderModelAssembler orderModelAssembler, TagModelAssembler tagModelAssembler) {
         this.userService = userService;
         this.userModelAssembler = userModelAssembler;
         this.orderModelAssembler = orderModelAssembler;
+        this.tagModelAssembler = tagModelAssembler;
     }
 
     @PostMapping
@@ -108,8 +114,8 @@ public class UserController {
 
     @GetMapping("/{userId}/orders")
     public ResponseEntity<PagedModel<OrderModel>> findOrdersForUser(@PathVariable String userId,
-                                                    @RequestParam(name = "page", defaultValue = RequestParameter.DEFAULT_PAGE_NUMBER) String page,
-                                                    @RequestParam(name = "size", defaultValue = RequestParameter.DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
+                                                                    @RequestParam(name = "page", defaultValue = RequestParameter.DEFAULT_PAGE_NUMBER) String page,
+                                                                    @RequestParam(name = "size", defaultValue = RequestParameter.DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
         long numUserId;
         int numPage;
         int numSize;
@@ -123,15 +129,32 @@ public class UserController {
         }
         Page<Order> orderPage = userService.findOrdersForUser(numUserId, numPage, numSize);
         List<Order> orders = orderPage.getList();
-        if(orders == null){
+        if (orders == null) {
             throw new NotFoundException(USER_NOT_FOUND, new Object[]{userId});
         }
-        if(!orders.isEmpty()){
-            PagedModel<OrderModel>orderModels = PageModelCreator.create(orderPage,orderModelAssembler);
+        if (!orders.isEmpty()) {
+            PagedModel<OrderModel> orderModels = PageModelCreator.create(orderPage, orderModelAssembler);
             return new ResponseEntity<>(orderModels, HttpStatus.OK);
         } else {
             throw new NotFoundException(USER_ORDERS_NOT_FOUND, new Object[]{userId});
         }
+    }
+
+    @GetMapping("/{userId}/orders/{orderId}")
+    public ResponseEntity<OrderModel> findOrderForUser(@PathVariable String userId, @PathVariable String orderId) throws BadRequestException, NotFoundException {
+        long parseUserId;
+        long parseOrderId;
+        try {
+            parseUserId = Long.parseLong(userId);
+            parseOrderId = Long.parseLong(orderId);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException(BAD_REQUEST, e, new Object[]{});
+        }
+        Optional<Order> optionalOrder = userService.findOrderForUser(parseUserId, parseOrderId);
+        return optionalOrder.map(orderModelAssembler::toModel)
+                .map(orderModel -> new ResponseEntity<>(orderModel, HttpStatus.OK))
+                .orElseThrow(() -> new NotFoundException(USER_OR_ORDER_NOT_FOUND, new Object[]{userId, orderId}));
     }
 
     @PutMapping("/{userId}/orders/{orderId}")
@@ -149,6 +172,14 @@ public class UserController {
         Optional<User> optionalUser = userService.addOrderToUser(parseUserId, parseOrderId);
         return optionalUser.map(userModelAssembler::toModel)
                 .map(userModel -> new ResponseEntity<>(userModel, HttpStatus.OK))
+                .orElseThrow(() -> new NotFoundException(USER_OR_ORDER_NOT_FOUND, new Object[]{userId, orderId}));
+    }
+
+    @GetMapping("/widely_used_tag")
+    public ResponseEntity<TagModel> findWidelyUsedTagForUserWithHighestCostOfAllOrders() throws NotFoundException {
+        Optional<Tag> optionalTag = userService.findWidelyUsedTagForUserWithHighestCostOfAllOrders();
+        return optionalTag.map(tagModelAssembler::toModel)
+                .map(tagModel -> new ResponseEntity<>(tagModel, HttpStatus.OK))
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND, new Object[]{}));
     }
 }

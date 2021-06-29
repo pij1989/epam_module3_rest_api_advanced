@@ -4,6 +4,7 @@ import com.epam.esm.model.dao.OrderDao;
 import com.epam.esm.model.dao.UserDao;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.Page;
+import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.entity.User;
 import com.epam.esm.model.service.UserService;
 import com.epam.esm.util.PaginationUtil;
@@ -102,5 +103,22 @@ public class UserServiceImpl implements UserService {
             createdPage = new Page<>(orders, totalPages, totalElements, page, size);
         }
         return createdPage;
+    }
+
+    @Override
+    @Transactional
+    public Optional<Order> findOrderForUser(Long userId, Long orderId) {
+        Optional<User> optionalUser = userDao.findById(userId);
+        if (optionalUser.isPresent()) {
+            return orderDao.findById(orderId);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public Optional<Tag> findWidelyUsedTagForUserWithHighestCostOfAllOrders() {
+        Tag tag = userDao.findWidelyUsedTagForUserWithHighestCostOfAllOrders();
+        return Optional.ofNullable(tag);
     }
 }
