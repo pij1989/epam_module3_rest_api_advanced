@@ -2,7 +2,6 @@ package com.epam.esm.controller;
 
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.OrderItem;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.assembler.OrderModelAssembler;
 import com.epam.esm.model.hateoas.model.OrderModel;
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static com.epam.esm.model.error.MessageKeyError.BAD_REQUEST;
-import static com.epam.esm.model.error.MessageKeyError.NOT_FOUND;
+import static com.epam.esm.model.error.MessageKeyError.ORDER_NOT_FOUND;
+import static com.epam.esm.model.error.MessageKeyError.ORDER_OR_CERTIFICATE_NOT_FOUND;
 
 @RestController
 @RequestMapping(value = "/orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE})
@@ -48,45 +47,29 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderModel> findOrder(@PathVariable String id) throws BadRequestException, NotFoundException {
-        long parseId;
-        try {
-            parseId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(BAD_REQUEST, e, new Object[]{});
-        }
-        Optional<Order> optionalOrder = orderService.findOrder(parseId);
+    public ResponseEntity<OrderModel> findOrder(@PathVariable Long id) throws NotFoundException {
+        Optional<Order> optionalOrder = orderService.findOrder(id);
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
             OrderModel orderModel = orderModelAssembler.toModel(order);
             return new ResponseEntity<>(orderModel, HttpStatus.OK);
         } else {
-            throw new NotFoundException(NOT_FOUND, new Object[]{});
+            throw new NotFoundException(ORDER_NOT_FOUND, new Object[]{id});
         }
     }
 
     @PutMapping("/{orderId}/gift_certificates/{certificateId}")
-    public ResponseEntity<OrderModel> addGiftCertificateToOrder(@PathVariable String orderId,
-                                                                @PathVariable String certificateId,
-                                                                @RequestBody OrderItem orderItem) throws BadRequestException, NotFoundException {
-        long parseOrderId;
-        long parseCertificateId;
-        try {
-            parseOrderId = Long.parseLong(orderId);
-            parseCertificateId = Long.parseLong(certificateId);
-        } catch (NumberFormatException e) {
-            logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(BAD_REQUEST, e, new Object[]{});
-        }
-        Optional<OrderItem> optionalOrderItem = orderService.addGiftCertificateToOrder(parseOrderId, parseCertificateId, orderItem);
+    public ResponseEntity<OrderModel> addGiftCertificateToOrder(@PathVariable Long orderId,
+                                                                @PathVariable Long certificateId,
+                                                                @RequestBody OrderItem orderItem) throws NotFoundException {
+        Optional<OrderItem> optionalOrderItem = orderService.addGiftCertificateToOrder(orderId, certificateId, orderItem);
         if (optionalOrderItem.isPresent()) {
             orderItem = optionalOrderItem.get();
             Order order = orderItem.getOrder();
             OrderModel orderModel = orderModelAssembler.toModel(order);
             return new ResponseEntity<>(orderModel, HttpStatus.OK);
         } else {
-            throw new NotFoundException(NOT_FOUND, new Object[]{});
+            throw new NotFoundException(ORDER_OR_CERTIFICATE_NOT_FOUND, new Object[]{orderId, certificateId});
         }
     }
 }

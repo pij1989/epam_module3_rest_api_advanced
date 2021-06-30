@@ -36,8 +36,8 @@ public class GiftCertificateModelAssembler implements RepresentationModelAssembl
         GiftCertificateModel giftCertificateModel = new GiftCertificateModel();
         try {
             giftCertificateModel.add(linkTo(methodOn(GiftCertificateController.class)
-                    .findGiftCertificate(entity.getId().toString())).withSelfRel());
-        } catch (BadRequestException | NotFoundException e) {
+                    .findGiftCertificate(entity.getId())).withSelfRel());
+        } catch (NotFoundException e) {
             logger.error(e.getMessage());
         }
         giftCertificateModel.setId(entity.getId());

@@ -19,6 +19,7 @@ public class MessageKeyError {
     public static final String ORDER_NOT_FOUND = "error.404.order";
     public static final String USER_ORDERS_NOT_FOUND = "error.404.user.orders";
     public static final String USER_OR_ORDER_NOT_FOUND = "error.404.user.order";
+    public static final String ORDER_OR_CERTIFICATE_NOT_FOUND = "error.404.order.certificate";
 
     private MessageKeyError() {
     }

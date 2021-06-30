@@ -3,7 +3,6 @@ package com.epam.esm.model.hateoas.assembler;
 import com.epam.esm.controller.UserController;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.User;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.model.OrderModel;
 import com.epam.esm.model.hateoas.model.UserModel;
@@ -35,8 +34,8 @@ public class UserModelAssembler implements RepresentationModelAssembler<User, Us
         UserModel userModel = new UserModel();
         try {
             userModel.add(linkTo(methodOn(UserController.class)
-                    .findUser(entity.getId().toString())).withSelfRel());
-        } catch (BadRequestException | NotFoundException e) {
+                    .findUser(entity.getId())).withSelfRel());
+        } catch (NotFoundException e) {
             logger.error(e.getMessage());
         }
         userModel.setId(entity.getId());

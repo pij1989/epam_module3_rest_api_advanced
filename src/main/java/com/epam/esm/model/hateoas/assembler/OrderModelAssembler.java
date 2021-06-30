@@ -3,7 +3,6 @@ package com.epam.esm.model.hateoas.assembler;
 import com.epam.esm.controller.OrderController;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.OrderItem;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.model.OrderItemModel;
 import com.epam.esm.model.hateoas.model.OrderModel;
@@ -35,8 +34,8 @@ public class OrderModelAssembler implements RepresentationModelAssembler<Order, 
         OrderModel orderModel = new OrderModel();
         try {
             orderModel.add(linkTo(methodOn(OrderController.class)
-                    .findOrder(entity.getId().toString())).withSelfRel());
-        } catch (BadRequestException | NotFoundException e) {
+                    .findOrder(entity.getId())).withSelfRel());
+        } catch (NotFoundException e) {
             logger.error(e.getMessage());
         }
         orderModel.setId(entity.getId());

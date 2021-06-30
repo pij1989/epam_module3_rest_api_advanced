@@ -4,7 +4,6 @@ import com.epam.esm.controller.GiftCertificateController;
 import com.epam.esm.controller.TagController;
 import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Tag;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.model.GiftCertificateModel;
 import com.epam.esm.model.hateoas.model.TagModel;
@@ -29,8 +28,8 @@ public class TagModelAssembler implements RepresentationModelAssembler<Tag, TagM
         TagModel tagModel = new TagModel();
         try {
             tagModel.add(linkTo(methodOn(TagController.class)
-                    .findTag(entity.getId().toString())).withSelfRel());
-        } catch (NotFoundException | BadRequestException e) {
+                    .findTag(entity.getId())).withSelfRel());
+        } catch (NotFoundException e) {
             logger.error(e.getMessage());
         }
         tagModel.setId(entity.getId());
@@ -54,9 +53,9 @@ public class TagModelAssembler implements RepresentationModelAssembler<Tag, TagM
                     giftCertificateModel.setLastUpdateDate(giftCertificate.getLastUpdateDate());
                     try {
                         giftCertificateModel.add(linkTo(methodOn(GiftCertificateController.class)
-                                .findGiftCertificate(giftCertificate.getId().toString()))
+                                .findGiftCertificate(giftCertificate.getId()))
                                 .withSelfRel());
-                    } catch (BadRequestException | NotFoundException e) {
+                    } catch (NotFoundException e) {
                         logger.error(e.getMessage());
                         throw new RuntimeException(e);
                     }

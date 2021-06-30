@@ -3,7 +3,6 @@ package com.epam.esm.controller;
 import com.epam.esm.model.creator.PageModelCreator;
 import com.epam.esm.model.entity.Page;
 import com.epam.esm.model.entity.Tag;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.assembler.TagModelAssembler;
 import com.epam.esm.model.hateoas.model.TagModel;
@@ -22,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.controller.RequestParameter.*;
-import static com.epam.esm.model.error.MessageKeyError.*;
+import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_NUMBER;
+import static com.epam.esm.controller.RequestParameter.DEFAULT_PAGE_SIZE;
+import static com.epam.esm.model.error.MessageKeyError.NOT_FOUND;
+import static com.epam.esm.model.error.MessageKeyError.TAG_NOT_FOUND;
 
 @RestController
 @RequestMapping(value = "/tags", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE})
@@ -51,15 +52,8 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TagModel> findTag(@PathVariable String id) throws NotFoundException, BadRequestException {
-        long parseId;
-        try {
-            parseId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(TAG_BAD_REQUEST, e, new Object[]{id});
-        }
-        Optional<Tag> optionalTag = tagService.findTag(parseId);
+    public ResponseEntity<TagModel> findTag(@PathVariable Long id) throws NotFoundException {
+        Optional<Tag> optionalTag = tagService.findTag(id);
         if (optionalTag.isPresent()) {
             Tag tag = optionalTag.get();
             TagModel tagModel = tagModelAssembler.toModel(tag);
@@ -77,18 +71,9 @@ public class TagController {
     }
 
     @GetMapping(params = {"page", "size"})
-    public ResponseEntity<PagedModel<TagModel>> findTags(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) String page,
-                                                         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) String size) throws BadRequestException, NotFoundException {
-        int numPage;
-        int numSize;
-        try {
-            numPage = Integer.parseInt(page);
-            numSize = Integer.parseInt(size);
-        } catch (NumberFormatException e) {
-            logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(TAG_BAD_REQUEST_PARAMETERS, e, new Object[]{page, size});
-        }
-        Page<Tag> tagPage = tagService.findTags(numPage, numSize);
+    public ResponseEntity<PagedModel<TagModel>> findTags(@RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) Integer page,
+                                                         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer size) throws NotFoundException {
+        Page<Tag> tagPage = tagService.findTags(page, size);
         if (!tagPage.getList().isEmpty()) {
             PagedModel<TagModel> pagedModel = PageModelCreator.create(tagPage, tagModelAssembler);
             return new ResponseEntity<>(pagedModel, HttpStatus.OK);
@@ -98,15 +83,8 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTag(@PathVariable String id) throws NotFoundException, BadRequestException {
-        long parseId;
-        try {
-            parseId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException(TAG_BAD_REQUEST, e, new Object[]{id});
-        }
-        if (tagService.deleteTag(parseId)) {
+    public ResponseEntity<Object> deleteTag(@PathVariable Long id) throws NotFoundException {
+        if (tagService.deleteTag(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             throw new NotFoundException(TAG_NOT_FOUND, new Object[]{id});
