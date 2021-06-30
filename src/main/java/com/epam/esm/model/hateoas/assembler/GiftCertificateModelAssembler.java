@@ -3,7 +3,6 @@ package com.epam.esm.model.hateoas.assembler;
 import com.epam.esm.controller.GiftCertificateController;
 import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Tag;
-import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.hateoas.model.GiftCertificateModel;
 import com.epam.esm.model.hateoas.model.TagModel;
