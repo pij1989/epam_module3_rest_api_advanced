@@ -172,4 +172,17 @@ public class GiftCertificateController {
         return optionalGiftCertificate.map(certificate -> new ResponseEntity<>(giftCertificateModelAssembler.toModel(certificate), HttpStatus.OK))
                 .orElseThrow(() -> new NotFoundException(CERTIFICATE_NOT_FOUND_ID, new Object[]{certificateId}));
     }
+
+    @GetMapping(params = {"tagname"})
+    public ResponseEntity<PagedModel<GiftCertificateModel>> searchGiftCertificateByTags(@RequestParam("tagname") String[] tagNames,
+                                                                                        @RequestParam(name = "page", defaultValue = DEFAULT_PAGE_NUMBER) Integer page,
+                                                                                        @RequestParam(name = "size", defaultValue = DEFAULT_PAGE_SIZE) Integer size) throws NotFoundException {
+        Page<GiftCertificate> certificatePage = giftCertificateService.searchGiftCertificateByTags(tagNames, page, size);
+        if (!certificatePage.getList().isEmpty()) {
+            PagedModel<GiftCertificateModel> certificateModels = PageModelCreator.create(certificatePage, giftCertificateModelAssembler);
+            return new ResponseEntity<>(certificateModels, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(NOT_FOUND, new Object[]{});
+        }
+    }
 }

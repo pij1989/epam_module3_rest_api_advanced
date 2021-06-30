@@ -12,13 +12,15 @@ public interface GiftCertificateDao extends BaseDao<Long, GiftCertificate> {
 
     Optional<GiftCertificate> updatePart(GiftCertificate giftCertificate);
 
-    List<GiftCertificate> findGiftCertificatesByTagNameWithOffsetAndLimit(String name,int offset, int limit);
+    List<GiftCertificate> findGiftCertificatesByTagNameWithOffsetAndLimit(String name, int offset, int limit);
 
     List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter, int offset, int limit);
 
     List<GiftCertificate> findGiftCertificatesWithOffsetAndLimit(int offset, int limit);
 
     List<GiftCertificate> findGiftCertificatesWithOffsetAndLimitOrderBy(int offset, int limit, Sort sort);
+
+    List<GiftCertificate> findGiftCertificateLikeTagNames(String[] tagNames, int offset, int limit);
 
     long countGiftCertificate();
 
@@ -27,4 +29,6 @@ public interface GiftCertificateDao extends BaseDao<Long, GiftCertificate> {
     long countGiftCertificateLikeNameOrDescription(String filter);
 
     Optional<GiftCertificate> updatePrice(long id, BigDecimal price);
+
+    long countGiftCertificateLikeTagNames(String[] tagNames);
 }

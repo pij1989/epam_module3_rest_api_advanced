@@ -184,8 +184,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
         Optional<GiftCertificate> optionalGiftCertificate = giftCertificateDao.findById(id);
         if (optionalGiftCertificate.isPresent()) {
-            return giftCertificateDao.updatePrice(id,price);
+            return giftCertificateDao.updatePrice(id, price);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Page<GiftCertificate> searchGiftCertificateByTags(String[] tagNames, int page, int size) {
+        List<GiftCertificate> certificates = new ArrayList<>();
+        int offset = (page - 1) * size;
+        long totalElements = giftCertificateDao.countGiftCertificateLikeTagNames(tagNames);
+        int totalPages = 0;
+        if (totalElements > 0) {
+            certificates = giftCertificateDao.findGiftCertificateLikeTagNames(tagNames, offset, size);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
+        return new Page<>(certificates, totalPages, totalElements, page, size);
     }
 }

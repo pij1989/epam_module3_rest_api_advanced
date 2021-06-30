@@ -10,10 +10,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
@@ -156,6 +159,19 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
+    public List<GiftCertificate> findGiftCertificateLikeTagNames(String[] tagNames, int offset, int limit) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> cq = cb.createQuery(GiftCertificate.class);
+        Root<GiftCertificate> root = cq.from(GiftCertificate.class);
+        Predicate[] predicates = Stream.of(tagNames)
+                .map(tagName ->cb.like(cb.upper(root.get(ColumnName.NAME)),PERCENT + tagName.toUpperCase() + PERCENT))
+                .collect(Collectors.toList())
+                .toArray(Predicate[]::new);
+        cq.select(root).where(cb.and(predicates));
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    @Override
     public long countGiftCertificate() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -187,5 +203,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         giftCertificate.setPrice(price);
         entityManager.flush();
         return Optional.of(giftCertificate);
+    }
+
+    @Override
+    public long countGiftCertificateLikeTagNames(String[] tagNames) {
+        return 0;
     }
 }

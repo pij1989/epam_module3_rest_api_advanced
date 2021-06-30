@@ -34,4 +34,6 @@ public interface GiftCertificateService {
     Page<GiftCertificate> sortGiftCertificate(String sort, String order, int page, int size);
 
     Optional<GiftCertificate> updatePriceGiftCertificate(BigDecimal price, long id);
+
+    Page<GiftCertificate> searchGiftCertificateByTags(String[] tagNames, int page, int size);
 }
