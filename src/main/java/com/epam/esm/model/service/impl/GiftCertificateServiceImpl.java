@@ -44,19 +44,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional
     public Optional<GiftCertificate> findGiftCertificate(Long id) {
         return giftCertificateDao.findById(id);
     }
 
     @Override
-    @Transactional
     public List<GiftCertificate> findAllGiftCertificate() {
         return giftCertificateDao.findAll();
     }
 
     @Override
-    @Transactional
     public Page<GiftCertificate> findGiftCertificates(int page, int size) {
         List<GiftCertificate> giftCertificates = new ArrayList<>();
         int offset = (page - 1) * size;

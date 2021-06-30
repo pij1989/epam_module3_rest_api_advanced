@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public Optional<Order> findOrder(Long id) {
         return orderDao.findById(id);
     }

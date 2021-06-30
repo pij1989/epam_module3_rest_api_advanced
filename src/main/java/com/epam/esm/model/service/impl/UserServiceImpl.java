@@ -40,7 +40,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Optional<User> findUser(Long id) {
         return userDao.findById(id);
     }
@@ -76,7 +75,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Page<User> findUsers(int page, int size) {
         List<User> users = new ArrayList<>();
         int offset = (page - 1) * size;
@@ -90,7 +88,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Page<Order> findOrdersForUser(Long userId, int page, int size) {
         List<Order> orders = new ArrayList<>();
         Page<Order> createdPage = new Page<>();
@@ -109,7 +106,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Optional<Order> findOrderForUser(Long userId, Long orderId) {
         Optional<User> optionalUser = userDao.findById(userId);
         if (optionalUser.isPresent()) {
@@ -119,7 +115,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public Optional<Tag> findWidelyUsedTagForUserWithHighestCostOfAllOrders() {
         Optional<User> optionalUser = userDao.findUserWithMaxSumCostOrders();
         return optionalUser.map(User::getId)

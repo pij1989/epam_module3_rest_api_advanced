@@ -32,13 +32,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional
     public Optional<Tag> findTag(Long id) {
         return tagDao.findById(id);
     }
 
     @Override
-    @Transactional
     public List<Tag> findAllTag() {
         return tagDao.findAll();
     }
@@ -50,7 +48,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional
     public Page<Tag> findTags(int page, int size) {
         List<Tag> tags = new ArrayList<>();
         int offset = (page - 1) * size;
