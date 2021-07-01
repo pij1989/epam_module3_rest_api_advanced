@@ -3,9 +3,7 @@ package com.epam.esm.model.entity;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @javax.persistence.Entity(name = "gift_certificates")
@@ -27,7 +25,7 @@ public class GiftCertificate implements Entity {
             joinColumns = {@JoinColumn(name = "gift_certificate_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
     )
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new HashSet<Tag>();
     @OneToMany(mappedBy = "giftCertificate",cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();
 
@@ -90,11 +88,11 @@ public class GiftCertificate implements Entity {
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 

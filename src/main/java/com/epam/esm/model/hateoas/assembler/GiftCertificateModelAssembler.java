@@ -13,7 +13,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -50,12 +50,12 @@ public class GiftCertificateModelAssembler implements RepresentationModelAssembl
         return giftCertificateModel;
     }
 
-    private List<TagModel> toTagModel(List<Tag> tags) {
+    private Set<TagModel> toTagModel(Set<Tag> tags) {
         if (tags.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
         return tags.stream()
                 .map(tagModelAssembler::toModel)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

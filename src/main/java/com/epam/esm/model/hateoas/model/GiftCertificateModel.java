@@ -4,8 +4,8 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GiftCertificateModel extends RepresentationModel<GiftCertificateModel> {
     private Long id;
@@ -15,13 +15,13 @@ public class GiftCertificateModel extends RepresentationModel<GiftCertificateMod
     private Integer duration;
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
-    private List<TagModel> tags = new ArrayList<>();
+    private Set<TagModel> tags = new HashSet<TagModel>();
 
     public GiftCertificateModel() {
     }
 
     public GiftCertificateModel(Long id, String name, String description, BigDecimal price, Integer duration,
-                                LocalDateTime createDate, LocalDateTime lastUpdateDate, List<TagModel> tags) {
+                                LocalDateTime createDate, LocalDateTime lastUpdateDate, Set<TagModel> tags) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -88,11 +88,11 @@ public class GiftCertificateModel extends RepresentationModel<GiftCertificateMod
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public List<TagModel> getTags() {
+    public Set<TagModel> getTags() {
         return tags;
     }
 
-    public void setTags(List<TagModel> tags) {
+    public void setTags(Set<TagModel> tags) {
         this.tags = tags;
     }
 

@@ -2,18 +2,18 @@ package com.epam.esm.model.hateoas.model;
 
 import org.springframework.hateoas.RepresentationModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TagModel extends RepresentationModel<TagModel> {
     private Long id;
     private String name;
-    private List<GiftCertificateModel> giftCertificates = new ArrayList<>();
+    private Set<GiftCertificateModel> giftCertificates = new HashSet<GiftCertificateModel>();
 
     public TagModel() {
     }
 
-    public TagModel(Long id, String name, List<GiftCertificateModel> giftCertificates) {
+    public TagModel(Long id, String name, Set<GiftCertificateModel> giftCertificates) {
         this.id = id;
         this.name = name;
         this.giftCertificates = giftCertificates;
@@ -35,11 +35,11 @@ public class TagModel extends RepresentationModel<TagModel> {
         this.name = name;
     }
 
-    public List<GiftCertificateModel> getGiftCertificates() {
+    public Set<GiftCertificateModel> getGiftCertificates() {
         return giftCertificates;
     }
 
-    public void setGiftCertificates(List<GiftCertificateModel> giftCertificates) {
+    public void setGiftCertificates(Set<GiftCertificateModel> giftCertificates) {
         this.giftCertificates = giftCertificates;
     }
 

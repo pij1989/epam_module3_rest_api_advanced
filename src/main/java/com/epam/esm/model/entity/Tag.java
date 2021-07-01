@@ -4,8 +4,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @javax.persistence.Entity(name = "tags")
 public class Tag implements Entity {
@@ -14,8 +14,7 @@ public class Tag implements Entity {
     private Long id;
     private String name;
     @ManyToMany(mappedBy = "tags")
-//    @JsonIgnoreProperties("tags")
-    private List<GiftCertificate> giftCertificates = new ArrayList<>();
+    private Set<GiftCertificate> giftCertificates = new HashSet<GiftCertificate>();
 
     public Long getId() {
         return id;
@@ -33,11 +32,11 @@ public class Tag implements Entity {
         this.name = name;
     }
 
-    public List<GiftCertificate> getGiftCertificates() {
+    public Set<GiftCertificate> getGiftCertificates() {
         return giftCertificates;
     }
 
-    public void setGiftCertificates(List<GiftCertificate> giftCertificates) {
+    public void setGiftCertificates(Set<GiftCertificate> giftCertificates) {
         this.giftCertificates = giftCertificates;
     }
 
@@ -59,15 +58,13 @@ public class Tag implements Entity {
         Tag tag = (Tag) o;
 
         if (id != null ? !id.equals(tag.id) : tag.id != null) return false;
-        if (name != null ? !name.equals(tag.name) : tag.name != null) return false;
-        return giftCertificates != null ? giftCertificates.equals(tag.giftCertificates) : tag.giftCertificates == null;
+        return name != null ? name.equals(tag.name) : tag.name == null;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (giftCertificates != null ? giftCertificates.hashCode() : 0);
         return result;
     }
 
@@ -76,7 +73,6 @@ public class Tag implements Entity {
         final StringBuilder sb = new StringBuilder("Tag{");
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
-        sb.append(", giftCertificates=").append(giftCertificates);
         sb.append('}');
         return sb.toString();
     }
