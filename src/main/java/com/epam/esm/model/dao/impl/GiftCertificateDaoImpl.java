@@ -21,6 +21,9 @@ import java.util.Optional;
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String PERCENT = "%";
     private static final String FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL = "SELECT gc.* FROM tags t JOIN gift_certificate_tags gct ON gct.tag_id = t.id JOIN gift_certificates gc ON gc.id = gct.gift_certificate_id WHERE t.name = ?";
+    private static final String FIND_GIFT_CERTIFICATES_BY_TAG_NAME_WITH_OFFSET_AND_LIMIT_JPQL = "SELECT gc FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name order by gc.id";
+    private static final String FIND_ALL_GIFT_CERTIFICATES_JPQL = "SELECT gc FROM gift_certificates gc order by gc.id";
+    private static final String COUNT_GIFT_CERTIFICATES_BY_TAG_NAME_JPQL = "SELECT count(t.name) FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -69,7 +72,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findGiftCertificatesByTagNameWithOffsetAndLimit(String name, int offset, int limit) {
-        return entityManager.createQuery("SELECT gc FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name order by gc.id", GiftCertificate.class)
+        return entityManager.createQuery(FIND_GIFT_CERTIFICATES_BY_TAG_NAME_WITH_OFFSET_AND_LIMIT_JPQL, GiftCertificate.class)
                 .setParameter(ColumnName.NAME, name)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
@@ -105,7 +108,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findAll() {
-        return entityManager.createQuery("SELECT gc FROM gift_certificates gc order by gc.id", GiftCertificate.class)
+        return entityManager.createQuery(FIND_ALL_GIFT_CERTIFICATES_JPQL, GiftCertificate.class)
                 .getResultList();
     }
 
@@ -179,7 +182,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long countGiftCertificateByTagName(String name) {
-        return entityManager.createQuery("SELECT count(t.name) FROM gift_certificates gc JOIN gc.tags t WHERE t.name = :name", Long.class)
+        return entityManager.createQuery(COUNT_GIFT_CERTIFICATES_BY_TAG_NAME_JPQL, Long.class)
                 .setParameter(ColumnName.NAME, name)
                 .getSingleResult();
     }

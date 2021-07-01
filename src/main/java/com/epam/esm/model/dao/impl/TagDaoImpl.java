@@ -14,6 +14,9 @@ import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
+    private static final String FIND_ALL_TAGS_JPQL = "SELECT t from tags t";
+    private static final String FIND_MAX_COUNT_TAG_BY_USER_ID_JPQL = "SELECT t FROM users u JOIN u.orders o JOIN o.orderItems oi JOIN oi.giftCertificate gc JOIN gc.tags t WHERE u.id = :userId GROUP BY t.id ORDER BY count(t.id) DESC";
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -31,7 +34,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findAll() {
-        return entityManager.createQuery("SELECT t from tags t", Tag.class)
+        return entityManager.createQuery(FIND_ALL_TAGS_JPQL, Tag.class)
                 .getResultList();
     }
 
@@ -64,7 +67,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> findMaxCountTagByUserId(Long userId) {
-        Tag tag = entityManager.createQuery("SELECT t FROM users u JOIN u.orders o JOIN o.orderItems oi JOIN oi.giftCertificate gc JOIN gc.tags t WHERE u.id = :userId GROUP BY t.id ORDER BY count(t.id) DESC", Tag.class)
+        Tag tag = entityManager.createQuery(FIND_MAX_COUNT_TAG_BY_USER_ID_JPQL, Tag.class)
                 .setParameter("userId", userId)
                 .setMaxResults(1)
                 .getSingleResult();

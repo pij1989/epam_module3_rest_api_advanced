@@ -2,7 +2,6 @@ package com.epam.esm.model.dao.impl;
 
 import com.epam.esm.model.dao.OrderDao;
 import com.epam.esm.model.entity.Order;
-import com.epam.esm.model.entity.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -15,6 +14,8 @@ import java.util.Optional;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
+    private static final String FIND_ALL_ORDERS_JPQL = "SELECT o FROM orders o";
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -32,7 +33,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findAll() {
-        return entityManager.createQuery("SELECT o FROM orders o", Order.class)
+        return entityManager.createQuery(FIND_ALL_ORDERS_JPQL, Order.class)
                 .getResultList();
     }
 

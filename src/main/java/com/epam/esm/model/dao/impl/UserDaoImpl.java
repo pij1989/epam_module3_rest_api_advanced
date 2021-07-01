@@ -17,15 +17,20 @@ import java.util.Optional;
 @Repository
 public class UserDaoImpl implements UserDao {
     //    SELECT t.id, count(t.id) FROM users u JOIN orders o ON o.user_id = u.id JOIN order_items oi ON oi.order_id = o.id JOIN gift_certificates gc ON gc.id = oi.gift_certificate_id JOIN gift_certificate_tags gct ON gct.gift_certificate_id = gc.id JOIN tags t ON t.id = gct.tag_id WHERE u.id = (SELECT u.id FROM users u JOIN orders o ON o.user_id = u.id GROUP BY u.id ORDER BY SUM(cost) DESC LIMIT 1) GROUP BY t.id ORDER BY count(t.id) DESC LIMIT 1;
+    private static final String FIND_ROLE_BY_ROLE_TYPE_JPQL = "SELECT r FROM roles r WHERE r.roleType = :name";
+    private static final String FIND_STATUS_BY_STATUS_TYPE_JPQL = "SELECT s FROM statuses s WHERE s.statusType = :name";
+    private static final String FIND_ALL_USERS_JPQL = "SELECT u FROM users u";
+    private static final String FIND_USER_WITH_MAX_SUM_COST_ORDERS_JPQL = "SELECT u FROM users u JOIN u.orders o GROUP BY u.id ORDER BY sum(o.cost) DESC";
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
     public User create(User entity) {
-        Role role = entityManager.createQuery("SELECT r FROM roles r WHERE r.roleType = :name", Role.class)
+        Role role = entityManager.createQuery(FIND_ROLE_BY_ROLE_TYPE_JPQL, Role.class)
                 .setParameter(ColumnName.NAME, entity.getRole().getRoleType())
                 .getSingleResult();
-        Status status = entityManager.createQuery("SELECT s FROM statuses s WHERE s.statusType = :name", Status.class)
+        Status status = entityManager.createQuery(FIND_STATUS_BY_STATUS_TYPE_JPQL, Status.class)
                 .setParameter(ColumnName.NAME, entity.getStatus().getStatusType())
                 .getSingleResult();
         entity.setRole(role);
@@ -42,7 +47,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        return entityManager.createQuery("SELECT u FROM users u", User.class)
+        return entityManager.createQuery(FIND_ALL_USERS_JPQL, User.class)
                 .getResultList();
     }
 
@@ -71,7 +76,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findUserWithMaxSumCostOrders() {
-        User user = entityManager.createQuery("SELECT u FROM users u JOIN u.orders o GROUP BY u.id ORDER BY sum(o.cost) DESC", User.class)
+        User user = entityManager.createQuery(FIND_USER_WITH_MAX_SUM_COST_ORDERS_JPQL, User.class)
                 .setMaxResults(1)
                 .getSingleResult();
         return Optional.ofNullable(user);

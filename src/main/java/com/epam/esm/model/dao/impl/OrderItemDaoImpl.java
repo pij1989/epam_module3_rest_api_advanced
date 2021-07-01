@@ -22,21 +22,21 @@ public class OrderItemDaoImpl implements OrderItemDao {
 
     @Override
     public Optional<OrderItem> findById(Long id) {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Unsupported operation 'findById' for OrderItemDao");
     }
 
     @Override
     public List<OrderItem> findAll() {
-        return null;
+        throw new UnsupportedOperationException("Unsupported operation 'findAll' for OrderItemDao");
     }
 
     @Override
     public Optional<OrderItem> update(OrderItem entity) {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Unsupported operation 'update' for OrderItemDao");
     }
 
     @Override
     public boolean deleteById(Long id) {
-        return false;
+        throw new UnsupportedOperationException("Unsupported operation 'delete' for OrderItemDao");
     }
 }
