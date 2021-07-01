@@ -191,35 +191,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Page<GiftCertificate> searchGiftCertificateByTags(String[] tagNames, int page, int size) {
-        /*List<GiftCertificate> certificates = giftCertificateDao.findAll().stream()
-                .filter(giftCertificate -> {
-                    Set<Tag> tags = new HashSet<>(giftCertificate.getTags());
-                    int quantity = tagNames.length;
-                    int count = 0;
-                    for (Tag tag : tags) {
-                        for (String tagName : tagNames) {
-                            if (tagName.equals(tag.getName())) {
-                                count++;
-                            }
-                        }
-                    }
-                    return count == quantity;
-                })
-                .collect(Collectors.toList());
-        int offset = (page - 1) * size;
-        certificates = certificates.stream()
-                .skip(offset)
-                .limit(size)
-                .collect(Collectors.toList());
-        int totalElements = certificates.size();
-        int totalPages = PaginationUtil.defineTotalPages(totalElements, size);*/
-
         List<GiftCertificate> certificates = new ArrayList<>();
         int offset = (page - 1) * size;
-        long totalElements = giftCertificateDao.countGiftCertificateLikeTagNames(tagNames);
+        long totalElements = giftCertificateDao.countGiftCertificateByTagNames(tagNames);
         int totalPages = 0;
-        certificates = giftCertificateDao.findGiftCertificateByTagNames(tagNames, offset, size);
-        totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        if (totalElements > 0) {
+            certificates = giftCertificateDao.findGiftCertificateByTagNames(tagNames, offset, size);
+            totalPages = PaginationUtil.defineTotalPages(totalElements, size);
+        }
         return new Page<>(certificates, totalPages, totalElements, page, size);
     }
 }

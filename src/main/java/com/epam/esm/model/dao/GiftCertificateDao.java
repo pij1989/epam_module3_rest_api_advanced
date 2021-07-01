@@ -30,5 +30,5 @@ public interface GiftCertificateDao extends BaseDao<Long, GiftCertificate> {
 
     Optional<GiftCertificate> updatePrice(long id, BigDecimal price);
 
-    long countGiftCertificateLikeTagNames(String[] tagNames);
+    long countGiftCertificateByTagNames(String[] tagNames);
 }

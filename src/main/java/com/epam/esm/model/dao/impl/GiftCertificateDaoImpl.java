@@ -8,17 +8,19 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String PERCENT = "%";
-    private static final String FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL = "SELECT gc.id, gc.name, gc.description, gc.price, gc.duration, gc.create_date, gc.last_update_date FROM tags t JOIN gift_certificate_tags gct ON gct.tag_id = t.id JOIN gift_certificates gc ON gc.id = gct.gift_certificate_id WHERE t.name = ?";
+    private static final String FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL = "SELECT gc.* FROM tags t JOIN gift_certificate_tags gct ON gct.tag_id = t.id JOIN gift_certificates gc ON gc.id = gct.gift_certificate_id WHERE t.name = ?";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -158,10 +160,13 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findGiftCertificateByTagNames(String[] tagNames, int offset, int limit) {
-        return (List<GiftCertificate>) entityManager.createNativeQuery(FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL + " INTERSECT " + FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL + "ORDER BY id",GiftCertificate.class)
-                .setParameter(1,tagNames[0])
-                .setParameter(2,tagNames[1])
-                .getResultList();
+        String sqlQuery = createSqlForFindByTags(tagNames);
+        System.out.println(sqlQuery);
+        Query query = entityManager.createNativeQuery(sqlQuery, GiftCertificate.class);
+        setParameters(tagNames, query);
+        @SuppressWarnings("unchecked")
+        List<GiftCertificate> giftCertificates = (List<GiftCertificate>) query.getResultList();
+        return giftCertificates;
     }
 
     @Override
@@ -199,7 +204,37 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public long countGiftCertificateLikeTagNames(String[] tagNames) {
-        return 0;
+    public long countGiftCertificateByTagNames(String[] tagNames) {
+        String sqlQuery = createSqlForCountByTags(tagNames);
+        Query query = entityManager.createNativeQuery(sqlQuery);
+        setParameters(tagNames, query);
+        BigInteger result = (BigInteger) query.getSingleResult();
+        return result.longValue();
+    }
+
+    private String createSqlForFindByTags(String[] tagNames) {
+        StringBuilder stringBuilder = new StringBuilder(FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL);
+        int count = 0;
+        while (count < tagNames.length - 1) {
+            stringBuilder.append(" INTERSECT ").append(FIND_GIFT_CERTIFICATES_BY_TAG_NAMES_SQL);
+            count++;
+        }
+        stringBuilder.append(" ORDER BY id");
+        return stringBuilder.toString();
+    }
+
+    private String createSqlForCountByTags(String[] tagNames) {
+        String sqlQuery = createSqlForFindByTags(tagNames);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT count(*) FROM (").append(sqlQuery).append(") AS result");
+        return stringBuilder.toString();
+    }
+
+    private void setParameters(String[] tagNames, Query query) {
+        int count = 1;
+        for (String tagName : tagNames) {
+            query.setParameter(count, tagName);
+            count++;
+        }
     }
 }
