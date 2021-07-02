@@ -67,4 +67,40 @@ public class Page<T extends Entity> {
     public boolean hasNext() {
         return number + 1 <= totalPages;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Page<?> page = (Page<?>) o;
+
+        if (totalPages != page.totalPages) return false;
+        if (totalElements != page.totalElements) return false;
+        if (number != page.number) return false;
+        if (size != page.size) return false;
+        return list != null ? list.equals(page.list) : page.list == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = list != null ? list.hashCode() : 0;
+        result = 31 * result + totalPages;
+        result = 31 * result + (int) (totalElements ^ (totalElements >>> 32));
+        result = 31 * result + number;
+        result = 31 * result + size;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Page{");
+        sb.append("list=").append(list);
+        sb.append(", totalPages=").append(totalPages);
+        sb.append(", totalElements=").append(totalElements);
+        sb.append(", number=").append(number);
+        sb.append(", size=").append(size);
+        sb.append('}');
+        return sb.toString();
+    }
 }
