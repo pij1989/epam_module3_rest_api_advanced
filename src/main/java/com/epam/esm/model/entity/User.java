@@ -1,10 +1,14 @@
 package com.epam.esm.model.entity;
 
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @javax.persistence.Entity(name = "users")
+@Audited
 public class User implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +22,11 @@ public class User implements Entity {
     private String password;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
+    @NotAudited
     private Role role;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "status_id")
+    @NotAudited
     private Status status;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();

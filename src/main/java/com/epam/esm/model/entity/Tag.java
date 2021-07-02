@@ -1,5 +1,7 @@
 package com.epam.esm.model.entity;
 
+import org.hibernate.envers.Audited;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -8,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @javax.persistence.Entity(name = "tags")
+@Audited
 public class Tag implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

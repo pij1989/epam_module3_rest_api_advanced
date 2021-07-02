@@ -1,5 +1,7 @@
 package com.epam.esm.model.entity;
 
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @javax.persistence.Entity(name="orders")
+@Audited
 public class Order implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

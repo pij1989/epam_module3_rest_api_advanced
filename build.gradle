@@ -22,6 +22,8 @@ dependencies {
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.2.Final'
     // https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager
     implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.5.2.Final'
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-envers
+    implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.5.2.Final'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
     // https://mvnrepository.com/artifact/org.postgresql/postgresql

@@ -1,8 +1,11 @@
 package com.epam.esm.model.entity;
 
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 
 @javax.persistence.Entity(name = "order_items")
+@Audited
 public class OrderItem implements Entity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
