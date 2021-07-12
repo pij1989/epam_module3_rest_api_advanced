@@ -1,5 +1,6 @@
 package com.epam.esm.model.hateoas.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.HashSet;
@@ -8,7 +9,8 @@ import java.util.Set;
 public class TagModel extends RepresentationModel<TagModel> {
     private Long id;
     private String name;
-    private Set<GiftCertificateModel> giftCertificates = new HashSet<GiftCertificateModel>();
+    @JsonIgnore
+    private Set<GiftCertificateModel> giftCertificates = new HashSet<>();
 
     public TagModel() {
     }

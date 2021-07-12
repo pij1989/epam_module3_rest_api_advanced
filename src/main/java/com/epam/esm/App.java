@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 
 @SpringBootApplication
 public class App {
+    private static final String PROFILE_ACTIVE = "profile.active";
+    private static final String DEFAULT_PROFILE = "prod";
+
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
         return builder -> builder.serializationInclusion(JsonInclude.Include.NON_NULL)
@@ -19,8 +22,9 @@ public class App {
     }
 
     public static void main(String[] args) {
+        String activeProfile = System.getProperty(PROFILE_ACTIVE) != null ? System.getProperty(PROFILE_ACTIVE) : DEFAULT_PROFILE;
         new SpringApplicationBuilder(App.class)
-                .profiles("dev")
+                .profiles(activeProfile)
                 .run(args);
     }
 }
